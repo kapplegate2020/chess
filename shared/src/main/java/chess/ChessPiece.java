@@ -221,6 +221,45 @@ public class ChessPiece {
                     moves.add(new ChessMove(myPosition, destination, null));
                 }
             }
+        } else if (type == PieceType.QUEEN) {
+            //first the diagonals
+            for(int i=0; i<4;i++){
+                int counter = 1;
+                boolean tryNext = true;
+                while(tryNext){
+                    int deltax = (2*(i/2)-1)*counter;
+                    int deltay = (2*(i%2)-1)*counter;
+                    ChessPosition destination = new ChessPosition(x+deltax, y+deltay);
+                    int validCode = validDestination(board, destination);
+                    if(validCode==0 || validCode==1){
+                        tryNext = false;
+                    }
+                    if(validCode==1 || validCode==2){
+                        moves.add(new ChessMove(myPosition, destination, null));
+                    }
+                    counter++;
+                }
+            }
+
+            //then the straights
+            for(int i=0; i<4;i++){
+                int counter = 1;
+                boolean tryNext = true;
+                while(tryNext){
+                    int deltax = (i/2)*(2*(i%2)-1)*counter;
+                    int deltay = (i/2-1)*(2*(i%2)-1)*counter;
+                    ChessPosition destination = new ChessPosition(x+deltax, y+deltay);
+                    int validCode = validDestination(board, destination);
+                    if(validCode==0 || validCode==1){
+                        tryNext = false;
+                    }
+                    if(validCode==1 || validCode==2){
+                        moves.add(new ChessMove(myPosition, destination, null));
+                    }
+                    counter++;
+                }
+            }
+
         }
         return moves;
     }
