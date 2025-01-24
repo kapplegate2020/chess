@@ -170,6 +170,36 @@ public class ChessPiece {
                     moves.add(new ChessMove(myPosition, destination, null));
                 }
             }
+        } else if(type == PieceType.PAWN) {
+            //get direction of movement and starting row
+            int direction = 1;
+            int start = 2;
+            if(pieceColor== ChessGame.TeamColor.BLACK){
+                direction = -1;
+                start = 6;
+            }
+            //check for capture
+            for(int i=-1; i<=1; i=i+2){
+                ChessPosition destination = new ChessPosition(x+direction, y+i);
+                int validCode = validDestination(board, destination);
+                if(validCode==1){
+                    moves.add(new ChessMove(myPosition, destination, null));
+                }
+            }
+
+            //check next space
+            ChessPosition destination = new ChessPosition(x+direction, y);
+            int validCode = validDestination(board, destination);
+            if(validCode==2){
+                moves.add(new ChessMove(myPosition, destination, null));
+            }
+            if(validCode==2 && x==start){
+                destination = new ChessPosition(x+2*direction, y);
+                validCode = validDestination(board, destination);
+                if(validCode==2){
+                    moves.add(new ChessMove(myPosition, destination, null));
+                }
+            }
         }
         return moves;
     }
