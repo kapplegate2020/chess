@@ -160,6 +160,16 @@ public class ChessPiece {
                     moves.add(new ChessMove(myPosition, destination, null));
                 }
             }
+        } else if(type == PieceType.KNIGHT) {
+            for(int i=0; i<8; i++){
+                int destinationx = x+((i%4)/2+1)*(2*(i/4)-1);
+                int destinationy = y+(-1*(i%4)/2+2)*(2*(i%2)-1);
+                ChessPosition destination = new ChessPosition(destinationx, destinationy);
+                int validCode = validDestination(board, destination);
+                if(validCode==1 || validCode==2){
+                    moves.add(new ChessMove(myPosition, destination, null));
+                }
+            }
         }
         return moves;
     }
