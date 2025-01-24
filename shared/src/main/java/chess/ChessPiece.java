@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Objects;
 
 /**
@@ -98,7 +100,34 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
+        int x = myPosition.getRow();
+        int y = myPosition.getColumn();
+        if(type == PieceType.BISHOP){
+            for(int i=0; i<4;i++){
+                int counter = 1;
+                boolean tryNext = true;
+                while(tryNext){
+                    int deltax = (2*(i/2)-1)*counter;
+                    int deltay = (2*(i%2)-1)*counter;
+                    ChessPosition destination = new ChessPosition(x+deltax, y+deltay);
+                    if(x+deltax>8 || x+deltax<1 || y+deltay>8 || y+deltay<1){
+                        tryNext = false;
+                    }
+                    else if(board.getPiece(destination)!=null){
+                        tryNext = false;
+                        if(board.getPiece(destination).pieceColor != pieceColor){
+                            moves.add(new ChessMove(myPosition, destination, null));
+                        }
+                    }
+                    else{
+                        moves.add(new ChessMove(myPosition, destination, null));
+                    }
+                    counter++;
+                }
+            }
+        }
+        return moves;
     }
 
     @Override
