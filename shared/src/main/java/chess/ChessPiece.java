@@ -171,28 +171,49 @@ public class ChessPiece {
                 }
             }
         } else if(type == PieceType.PAWN) {
-            //get direction of movement and starting row
+            //get direction of movement and starting row and last row
             int direction = 1;
             int start = 2;
+            int last = 8;
             if(pieceColor== ChessGame.TeamColor.BLACK){
                 direction = -1;
-                start = 6;
+                start = 7;
+                last = 1;
             }
+
             //check for capture
             for(int i=-1; i<=1; i=i+2){
                 ChessPosition destination = new ChessPosition(x+direction, y+i);
                 int validCode = validDestination(board, destination);
                 if(validCode==1){
-                    moves.add(new ChessMove(myPosition, destination, null));
+                    if(x+direction != last){
+                        moves.add(new ChessMove(myPosition, destination, null));
+                    }
+                    else{
+                        moves.add(new ChessMove(myPosition, destination, PieceType.BISHOP));
+                        moves.add(new ChessMove(myPosition, destination, PieceType.KNIGHT));
+                        moves.add(new ChessMove(myPosition, destination, PieceType.QUEEN));
+                        moves.add(new ChessMove(myPosition, destination, PieceType.ROOK));
+                    }
                 }
             }
 
-            //check next space
+            //check next space, promote if possible
             ChessPosition destination = new ChessPosition(x+direction, y);
             int validCode = validDestination(board, destination);
             if(validCode==2){
-                moves.add(new ChessMove(myPosition, destination, null));
+                if(x+direction != last){
+                    moves.add(new ChessMove(myPosition, destination, null));
+                }
+                else {
+                    moves.add(new ChessMove(myPosition, destination, PieceType.BISHOP));
+                    moves.add(new ChessMove(myPosition, destination, PieceType.KNIGHT));
+                    moves.add(new ChessMove(myPosition, destination, PieceType.QUEEN));
+                    moves.add(new ChessMove(myPosition, destination, PieceType.ROOK));
+                }
             }
+
+            //check 2 spaces forward
             if(validCode==2 && x==start){
                 destination = new ChessPosition(x+2*direction, y);
                 validCode = validDestination(board, destination);
