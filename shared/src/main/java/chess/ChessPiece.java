@@ -92,6 +92,24 @@ public class ChessPiece {
         return type;
     }
 
+    //returns 0 if off board or friendly piece
+    //returns 1 if enemy piece is there
+    //returns 2 if space is empty
+    private int validDestination(ChessBoard board, ChessPosition destination){
+        int x = destination.getRow();
+        int y = destination.getColumn();
+        if(x>8 || x<1 || y>8 || y<1){
+            return 0;
+        }
+        if(board.getPiece(destination)!=null){
+            if(board.getPiece(destination).pieceColor != pieceColor){
+                return 1;
+            }
+            return 0;
+        }
+        return 2;
+    }
+
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -111,19 +129,35 @@ public class ChessPiece {
                     int deltax = (2*(i/2)-1)*counter;
                     int deltay = (2*(i%2)-1)*counter;
                     ChessPosition destination = new ChessPosition(x+deltax, y+deltay);
-                    if(x+deltax>8 || x+deltax<1 || y+deltay>8 || y+deltay<1){
+                    int validCode = validDestination(board, destination);
+                    if(validCode==0 || validCode==1){
                         tryNext = false;
                     }
-                    else if(board.getPiece(destination)!=null){
-                        tryNext = false;
-                        if(board.getPiece(destination).pieceColor != pieceColor){
-                            moves.add(new ChessMove(myPosition, destination, null));
-                        }
-                    }
-                    else{
+                    if(validCode==1 || validCode==2){
                         moves.add(new ChessMove(myPosition, destination, null));
                     }
                     counter++;
+                }
+            }
+        }
+        else if(type == PieceType.KING){
+            for(int i=0; i<4;i++){
+                //first check diagonals
+                int diagonalx = x+(2*(i/2)-1);
+                int diagonaly = y+(2*(i%2)-1);
+                ChessPosition destination = new ChessPosition(diagonalx, diagonaly);
+                int validCode = validDestination(board, destination);
+                if(validCode==1 || validCode==2){
+                    moves.add(new ChessMove(myPosition, destination, null));
+                }
+
+                //then check straight lines
+                int straightx = x+(i/2)*(2*(i%2)-1);
+                int straighty = y+(i/2-1)*(2*(i%2)-1);
+                destination = new ChessPosition(straightx, straighty);
+                validCode = validDestination(board, destination);
+                if(validCode==1 || validCode==2){
+                    moves.add(new ChessMove(myPosition, destination, null));
                 }
             }
         }
