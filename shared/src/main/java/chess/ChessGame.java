@@ -14,7 +14,7 @@ public class ChessGame {
     ChessBoard board = new ChessBoard();
 
     public ChessGame() {
-
+        board.resetBoard();
     }
 
     /**
@@ -49,7 +49,23 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(startPosition);
+        if(board == null){
+            return null;
+        }
+
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        for(ChessMove move : piece.pieceMoves(board, startPosition)){
+            ChessBoard potentialBoard = board.copy();
+            potentialBoard.addPiece(startPosition, null);
+            ChessPosition endPosition = move.getEndPosition();
+            potentialBoard.addPiece(endPosition, piece);
+            if(!boardIsInCheck(potentialBoard, piece.getTeamColor())){
+                moves.add(move);
+            }
+
+        }
+        return moves;
     }
 
     /**
@@ -62,13 +78,41 @@ public class ChessGame {
         throw new RuntimeException("Not implemented");
     }
 
+
     /**
-     * Determines if the given team is in check
+     * Makes a move in a chess game
      *
-     * @param teamColor which team to check for check
-     * @return True if the specified team is in check
+     * @param teamColor which team to check
+     * @return arrayList of all valid moves for a team
+     *
      */
-    public boolean isInCheck(TeamColor teamColor) {
+    private Collection<ChessMove> getAllMoves(TeamColor teamColor){
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        for(int i=1; i<=8; i++){
+            for(int j=1; j<=8; j++){
+                ChessPosition position = new ChessPosition(i, j);
+                ChessPiece piece = board.getPiece(position);
+                if(piece != null){
+                    if(piece.getTeamColor()!= teamColor){
+                        ArrayList<ChessMove> pieceMoves = (ArrayList<ChessMove>) piece.pieceMoves(board, position);
+                        moves.addAll(pieceMoves);
+                    }
+                }
+            }
+        }
+        return moves;
+    }
+
+
+    /**
+     * Makes a move in a chess game
+     *
+     * @param board chess board to check
+     * @param teamColor which team to check
+     * @return True if the specified team is in check
+     *
+     */
+    private boolean boardIsInCheck(ChessBoard board, TeamColor teamColor){
         //first, find the king
         ChessPosition kingLocation = null;
         for(int i=1; i<=8; i++){
@@ -84,25 +128,24 @@ public class ChessGame {
         }
 
         //then, check if anyone is challenging the king
-        for(int i=1; i<=8; i++){
-            for(int j=1; j<=8; j++){
-                ChessPosition position = new ChessPosition(i, j);
-                ChessPiece piece = board.getPiece(position);
-                if(piece != null){
-                    if(piece.getTeamColor()!= teamColor){
-                        ArrayList<ChessMove> moves = (ArrayList<ChessMove>) piece.pieceMoves(board, position);
-                        for (ChessMove move : moves) {
-                            ChessPosition destination = move.getEndPosition();
-                            if (destination.equals(kingLocation)) {
-                                return true;
-                            }
-                        }
-                    }
-                }
+        for(ChessMove move : getAllMoves(teamColor)){
+            ChessPosition destination = move.getEndPosition();
+            if(destination.equals(kingLocation)){
+                return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Determines if the given team is in check
+     *
+     * @param teamColor which team to check for check
+     * @return True if the specified team is in check
+     */
+    public boolean isInCheck(TeamColor teamColor) {
+        return boardIsInCheck(board, teamColor);
     }
 
     /**

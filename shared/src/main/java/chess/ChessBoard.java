@@ -104,6 +104,22 @@ public class ChessBoard {
 
     }
 
+
+    public ChessBoard copy(){
+        ChessBoard boardCopy = new ChessBoard();
+        for(int i=1; i<=8; i++){
+            for(int j=1; j<=8; j++){
+                ChessPosition position = new ChessPosition(i, j);
+                ChessPiece piece = getPiece(position);
+                if(piece != null){
+                    ChessPiece pieceCopy = new ChessPiece(piece.getTeamColor(), piece.getPieceType());
+                    boardCopy.addPiece(position, pieceCopy);
+                }
+            }
+        }
+        return boardCopy;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
