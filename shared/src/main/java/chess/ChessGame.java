@@ -91,9 +91,9 @@ public class ChessGame {
                 if(piece != null){
                     if(piece.getTeamColor()!= teamColor){
                         ArrayList<ChessMove> moves = (ArrayList<ChessMove>) piece.pieceMoves(board, position);
-                        for(int k=0; k<moves.size(); k++){
-                            ChessPosition destination = moves.get(k).getEndPosition();
-                            if(destination == kingLocation){
+                        for (ChessMove move : moves) {
+                            ChessPosition destination = move.getEndPosition();
+                            if (destination.equals(kingLocation)) {
                                 return true;
                             }
                         }
