@@ -61,6 +61,7 @@ public class ChessGame {
             ChessPosition endPosition = move.getEndPosition();
             potentialBoard.addPiece(endPosition, piece);
             if(!boardIsInCheck(potentialBoard, piece.getTeamColor())){
+                System.out.println(potentialBoard);
                 moves.add(move);
             }
 
@@ -86,7 +87,7 @@ public class ChessGame {
      * @return arrayList of all valid moves for a team
      *
      */
-    private Collection<ChessMove> getAllMoves(TeamColor teamColor){
+    private Collection<ChessMove> getAllMoves(ChessBoard board, TeamColor teamColor){
         ArrayList<ChessMove> moves = new ArrayList<>();
         for(int i=1; i<=8; i++){
             for(int j=1; j<=8; j++){
@@ -128,7 +129,7 @@ public class ChessGame {
         }
 
         //then, check if anyone is challenging the king
-        for(ChessMove move : getAllMoves(teamColor)){
+        for(ChessMove move : getAllMoves(board, teamColor)){
             ChessPosition destination = move.getEndPosition();
             if(destination.equals(kingLocation)){
                 return true;
