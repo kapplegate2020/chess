@@ -34,7 +34,7 @@ public class MemoryAuthDataAccess implements AuthDataAccess{
     }
 
     @Override
-    public void clear() throws DataAccessException {
+    public void clear() {
         auths.clear();
     }
 }

@@ -37,7 +37,7 @@ public class MemoryGameDataAccess implements GameDataAccess{
     }
 
     @Override
-    public void clear() throws DataAccessException {
+    public void clear() {
         games.clear();
     }
 }
