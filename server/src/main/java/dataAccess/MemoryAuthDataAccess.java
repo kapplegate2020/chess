@@ -34,7 +34,12 @@ public class MemoryAuthDataAccess implements AuthDataAccess{
     }
 
     @Override
-    public void clear() {
-        auths.clear();
+    public void clear() throws DataAccessException {
+        try {
+            auths.clear();
+        }
+        catch (Exception e){
+            throw new DataAccessException(e.getMessage());
+        }
     }
 }

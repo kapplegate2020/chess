@@ -24,7 +24,12 @@ public class MemoryUserDataAccess implements UserDataAccess{
     }
 
     @Override
-    public void clear() {
-        users.clear();
+    public void clear()  throws DataAccessException {
+        try {
+            users.clear();
+        }
+        catch (Exception e){
+            throw new DataAccessException(e.getMessage());
+        }
     }
 }

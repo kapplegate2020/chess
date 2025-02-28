@@ -1,6 +1,8 @@
 package service;
 
+import Result.ClearResult;
 import dataAccess.AuthDataAccess;
+import dataAccess.DataAccessException;
 import dataAccess.GameDataAccess;
 import dataAccess.UserDataAccess;
 
@@ -15,12 +17,15 @@ public class ClearService {
         this.authDataAccess = authDataAccess;
     }
 
-
-
-
-    public void clear(){
-        userDataAccess.clear();
-        gameDataAccess.clear();
-        authDataAccess.clear();
+    public ClearResult clear(){
+        try {
+            userDataAccess.clear();
+            gameDataAccess.clear();
+            authDataAccess.clear();
+            return new ClearResult(null, null);
+        }
+        catch (DataAccessException e){
+            return new ClearResult(500, e.getMessage());
+        }
     }
 }

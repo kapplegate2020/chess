@@ -37,7 +37,12 @@ public class MemoryGameDataAccess implements GameDataAccess{
     }
 
     @Override
-    public void clear() {
-        games.clear();
+    public void clear()  throws DataAccessException {
+        try {
+            games.clear();
+        }
+        catch(Exception e){
+            throw new DataAccessException(e.getMessage());
+        }
     }
 }
