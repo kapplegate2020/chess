@@ -9,18 +9,28 @@ public class MemoryUserDataAccess implements UserDataAccess{
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-        if(users.containsKey(userData.username())){
-            throw new DataAccessException("Username Taken");
+        try {
+            if (users.containsKey(userData.username())) {
+                throw new DataAccessException("Username Taken");
+            }
+            users.put(userData.username(), userData);
         }
-        users.put(userData.username(), userData);
+        catch (Exception e){
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        if(users.containsKey(username)){
-            return users.get(username);
+        try{
+            if(users.containsKey(username)){
+                return users.get(username);
+            }
+            return null;
         }
-        return null;
+            catch (Exception e){
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     @Override

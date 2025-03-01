@@ -10,30 +10,50 @@ public class MemoryGameDataAccess implements GameDataAccess{
 
     @Override
     public void createGame(GameData gameData) throws DataAccessException {
-        if(games.containsKey(gameData.gameID())){
-            throw new DataAccessException("GameID is already taken.");
+        try{
+            if(games.containsKey(gameData.gameID())){
+                throw new DataAccessException("GameID is already taken.");
+            }
+        }
+        catch (Exception e){
+            throw new DataAccessException(e.getMessage());
         }
     }
 
     @Override
     public ArrayList<GameData> listGames() throws DataAccessException {
-        return new ArrayList<GameData>(games.values());
+        try{
+            return new ArrayList<GameData>(games.values());
+        }
+        catch (Exception e){
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     @Override
     public void updateGame(GameData gameData) throws DataAccessException {
-        if(!games.containsKey(gameData.gameID())){
-            throw new DataAccessException("GameID does not exist.");
+        try{
+            if(!games.containsKey(gameData.gameID())){
+                throw new DataAccessException("GameID does not exist.");
+            }
+            games.put(gameData.gameID(), gameData);
         }
-        games.put(gameData.gameID(), gameData);
+        catch (Exception e){
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
-        if(games.containsKey(gameID)){
-            return games.get(gameID);
+        try{
+            if(games.containsKey(gameID)){
+                return games.get(gameID);
+            }
+            return null;
         }
-        return null;
+        catch (Exception e){
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     @Override

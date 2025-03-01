@@ -9,27 +9,42 @@ public class MemoryAuthDataAccess implements AuthDataAccess{
 
     @Override
     public void createAuth(AuthData authData) throws DataAccessException {
-        if(auths.containsKey(authData.authToken())){
-            throw new DataAccessException("AuthToken already used.");
+        try{
+            if(auths.containsKey(authData.authToken())){
+                throw new DataAccessException("AuthToken already used.");
+            }
+            auths.put(authData.authToken(), authData);
         }
-        auths.put(authData.authToken(), authData);
+        catch (Exception e){
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
-        if(auths.containsKey(authToken)){
-            return auths.get(authToken);
+        try{
+            if(auths.containsKey(authToken)){
+                return auths.get(authToken);
+            }
+            return null;
         }
-        return null;
+        catch (Exception e){
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     @Override
     public void deleteAuth(AuthData authData) throws DataAccessException {
-        if(auths.containsKey(authData.authToken())){
-            auths.remove(authData.authToken());
+        try{
+            if(auths.containsKey(authData.authToken())){
+                auths.remove(authData.authToken());
+            }
+            else{
+                throw new DataAccessException("AuthData not found.");
+            }
         }
-        else{
-            throw new DataAccessException("AuthData not found.");
+        catch (Exception e){
+            throw new DataAccessException(e.getMessage());
         }
     }
 
