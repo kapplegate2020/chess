@@ -2,6 +2,9 @@ package server;
 
 import Request.RegisterRequest;
 
+import Result.PackagedErrorResult;
+import Result.PackagedRegisterResult;
+import Result.RegisterResult;
 import com.google.gson.Gson;
 import dataAccess.AuthDataAccess;
 import dataAccess.MemoryAuthDataAccess;
@@ -37,6 +40,13 @@ public class Server {
 
     private Object register(Request req, Response res){
         var registerRequest = new Gson().fromJson(req.body(), RegisterRequest.class);
-        return userService.register(registerRequest);
+        RegisterResult registerResult = userService.register(registerRequest);
+        res.status(registerResult.statusNumber());
+        if(registerResult.statusNumber() == 200){
+            PackagedRegisterResult packagedRegisterResult = new PackagedRegisterResult(registerResult.username(), registerResult.authToken());
+            return new Gson().toJson(packagedRegisterResult);
+        }
+        PackagedErrorResult packagedErrorResult = new PackagedErrorResult(registerResult.error());
+        return new Gson().toJson(packagedErrorResult);
     }
 }

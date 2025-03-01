@@ -34,7 +34,7 @@ public class UserService {
                 String authToken = generateToken();
                 AuthData authData = new AuthData(authToken, registerRequest.username());
                 authDataAccess.createAuth(authData);
-                return new RegisterResult(username, authToken, null, null);
+                return new RegisterResult(username, authToken, 200, null);
             }
             return new RegisterResult(null, null, 403, "Error:already taken");
         }
