@@ -2,8 +2,6 @@ package server;
 
 import Request.RegisterRequest;
 
-import Result.PackagedErrorResult;
-import Result.PackagedRegisterResult;
 import Result.RegisterResult;
 import com.google.gson.Gson;
 import dataAccess.AuthDataAccess;
@@ -14,9 +12,9 @@ import service.UserService;
 import spark.*;
 
 public class Server {
-    UserDataAccess userDataAccess = new MemoryUserDataAccess();
-    AuthDataAccess authDataAccess = new MemoryAuthDataAccess();
-    UserService userService = new UserService(userDataAccess, authDataAccess);
+    private final UserDataAccess userDataAccess = new MemoryUserDataAccess();
+    private final AuthDataAccess authDataAccess = new MemoryAuthDataAccess();
+    private final UserService userService = new UserService(userDataAccess, authDataAccess);
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -42,11 +40,6 @@ public class Server {
         var registerRequest = new Gson().fromJson(req.body(), RegisterRequest.class);
         RegisterResult registerResult = userService.register(registerRequest);
         res.status(registerResult.statusNumber());
-        if(registerResult.statusNumber() == 200){
-            PackagedRegisterResult packagedRegisterResult = new PackagedRegisterResult(registerResult.username(), registerResult.authToken());
-            return new Gson().toJson(packagedRegisterResult);
-        }
-        PackagedErrorResult packagedErrorResult = new PackagedErrorResult(registerResult.error());
-        return new Gson().toJson(packagedErrorResult);
+        return new Gson().toJson(registerResult);
     }
 }

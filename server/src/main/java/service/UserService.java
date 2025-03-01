@@ -36,7 +36,7 @@ public class UserService {
                 authDataAccess.createAuth(authData);
                 return new RegisterResult(username, authToken, 200, null);
             }
-            return new RegisterResult(null, null, 403, "Error:already taken");
+            return new RegisterResult(null, null, 403, "Error: already taken");
         }
         catch (DataAccessException e){
             return new RegisterResult(null, null, 500, e.getMessage());
