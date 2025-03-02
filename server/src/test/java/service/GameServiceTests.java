@@ -1,11 +1,11 @@
 package service;
 
-import Request.CreateGameRequest;
-import Request.JoinGameRequest;
-import Request.ListGamesRequest;
-import Result.CreateGameResult;
-import Result.JoinGameResult;
-import Result.ListGamesResult;
+import request.CreateGameRequest;
+import request.JoinGameRequest;
+import request.ListGamesRequest;
+import result.CreateGameResult;
+import result.JoinGameResult;
+import result.ListGamesResult;
 import chess.ChessGame;
 import dataAccess.*;
 import model.AuthData;

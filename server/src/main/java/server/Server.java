@@ -1,9 +1,9 @@
 package server;
 
-import Request.RegisterRequest;
+import request.RegisterRequest;
 
-import Result.*;
-import Request.*;
+import result.*;
+import request.*;
 import com.google.gson.Gson;
 import dataAccess.*;
 import service.ClearService;

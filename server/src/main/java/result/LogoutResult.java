@@ -1,4 +1,4 @@
-package Result;
+package result;
 
 public record LogoutResult(Integer statusNumber, String message) {
     public LogoutResult removeStatusNumber(){

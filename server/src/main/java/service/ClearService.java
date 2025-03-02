@@ -1,6 +1,6 @@
 package service;
 
-import Result.ClearResult;
+import result.ClearResult;
 import dataAccess.AuthDataAccess;
 import dataAccess.DataAccessException;
 import dataAccess.GameDataAccess;

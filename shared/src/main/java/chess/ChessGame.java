@@ -188,6 +188,22 @@ public class ChessGame {
         return boardIsInCheck(board, teamColor);
     }
 
+
+    private boolean hasValidMove(TeamColor teamColor){
+        for(int i=1; i<=8; i++){
+            for(int j=1; j<=8; j++){
+                ChessPosition position = new ChessPosition(i, j);
+                ChessPiece piece = board.getPiece(position);
+                if(piece != null){
+                    if(piece.getTeamColor()== teamColor && !validMoves(position).isEmpty()){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * Determines if the given team is in checkmate
      *
@@ -198,23 +214,7 @@ public class ChessGame {
         if(!isInCheck(teamColor)){
             return false;
         }
-
-        boolean hasValidMove = false;
-        for(int i=1; i<=8; i++){
-            for(int j=1; j<=8; j++){
-                ChessPosition position = new ChessPosition(i, j);
-                ChessPiece piece = board.getPiece(position);
-                if(piece != null){
-                    if(piece.getTeamColor()== teamColor){
-                        if(!validMoves(position).isEmpty()){
-                            hasValidMove = true;
-                        }
-                    }
-                }
-            }
-        }
-
-        return !hasValidMove;
+        return !hasValidMove(teamColor);
     }
 
     /**
@@ -228,23 +228,7 @@ public class ChessGame {
         if(isInCheck(teamColor)){
             return false;
         }
-
-        boolean hasValidMove = false;
-        for(int i=1; i<=8; i++){
-            for(int j=1; j<=8; j++){
-                ChessPosition position = new ChessPosition(i, j);
-                ChessPiece piece = board.getPiece(position);
-                if(piece != null){
-                    if(piece.getTeamColor()== teamColor){
-                        if(!validMoves(position).isEmpty()){
-                            hasValidMove = true;
-                        }
-                    }
-                }
-            }
-        }
-
-        return !hasValidMove;
+        return !hasValidMove(teamColor);
     }
 
     /**

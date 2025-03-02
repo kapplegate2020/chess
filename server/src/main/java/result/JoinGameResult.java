@@ -1,4 +1,4 @@
-package Result;
+package result;
 
 public record JoinGameResult(Integer statusNumber, String message) {
     public JoinGameResult removeStatusNumber(){

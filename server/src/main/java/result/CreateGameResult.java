@@ -1,4 +1,4 @@
-package Result;
+package result;
 
 public record CreateGameResult(Integer gameID, Integer statusNumber, String message) {
     public CreateGameResult removeStatusNumber(){

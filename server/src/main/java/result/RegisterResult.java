@@ -1,4 +1,4 @@
-package Result;
+package result;
 
 public record RegisterResult(String username, String authToken, Integer statusNumber, String message) {
     public RegisterResult removeStatusNumber(){

@@ -110,6 +110,54 @@ public class ChessPiece {
         return 2;
     }
 
+    private ArrayList<ChessMove> checkDiagonals(ChessBoard board, ChessPosition myPosition){
+        ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
+        int x = myPosition.getRow();
+        int y = myPosition.getColumn();
+        for(int i=0; i<4;i++){
+            int counter = 1;
+            boolean tryNext = true;
+            while(tryNext){
+                int deltax = (2*(i/2)-1)*counter;
+                int deltay = (2*(i%2)-1)*counter;
+                ChessPosition destination = new ChessPosition(x+deltax, y+deltay);
+                int validCode = validDestination(board, destination);
+                if(validCode==0 || validCode==1){
+                    tryNext = false;
+                }
+                if(validCode==1 || validCode==2){
+                    moves.add(new ChessMove(myPosition, destination, null));
+                }
+                counter++;
+            }
+        }
+        return moves;
+    }
+
+    private ArrayList<ChessMove> checkStraights(ChessBoard board, ChessPosition myPosition){
+        ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
+        int x = myPosition.getRow();
+        int y = myPosition.getColumn();
+        for(int i=0; i<4;i++){
+            int counter = 1;
+            boolean tryNext = true;
+            while(tryNext){
+                int deltax = (i/2)*(2*(i%2)-1)*counter;
+                int deltay = (i/2-1)*(2*(i%2)-1)*counter;
+                ChessPosition destination = new ChessPosition(x+deltax, y+deltay);
+                int validCode = validDestination(board, destination);
+                if(validCode==0 || validCode==1){
+                    tryNext = false;
+                }
+                if(validCode==1 || validCode==2){
+                    moves.add(new ChessMove(myPosition, destination, null));
+                }
+                counter++;
+            }
+        }
+        return moves;
+    }
+
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -122,23 +170,7 @@ public class ChessPiece {
         int x = myPosition.getRow();
         int y = myPosition.getColumn();
         if(type == PieceType.BISHOP){
-            for(int i=0; i<4;i++){
-                int counter = 1;
-                boolean tryNext = true;
-                while(tryNext){
-                    int deltax = (2*(i/2)-1)*counter;
-                    int deltay = (2*(i%2)-1)*counter;
-                    ChessPosition destination = new ChessPosition(x+deltax, y+deltay);
-                    int validCode = validDestination(board, destination);
-                    if(validCode==0 || validCode==1){
-                        tryNext = false;
-                    }
-                    if(validCode==1 || validCode==2){
-                        moves.add(new ChessMove(myPosition, destination, null));
-                    }
-                    counter++;
-                }
-            }
+            moves = checkDiagonals(board, myPosition);
         }
         else if(type == PieceType.KING){
             for(int i=0; i<4;i++){
@@ -222,61 +254,11 @@ public class ChessPiece {
                 }
             }
         } else if (type == PieceType.QUEEN) {
-            //first the diagonals
-            for(int i=0; i<4;i++){
-                int counter = 1;
-                boolean tryNext = true;
-                while(tryNext){
-                    int deltax = (2*(i/2)-1)*counter;
-                    int deltay = (2*(i%2)-1)*counter;
-                    ChessPosition destination = new ChessPosition(x+deltax, y+deltay);
-                    int validCode = validDestination(board, destination);
-                    if(validCode==0 || validCode==1){
-                        tryNext = false;
-                    }
-                    if(validCode==1 || validCode==2){
-                        moves.add(new ChessMove(myPosition, destination, null));
-                    }
-                    counter++;
-                }
-            }
+            moves = checkDiagonals(board, myPosition);
+            moves.addAll(checkStraights(board, myPosition));
 
-            //then the straights
-            for(int i=0; i<4;i++){
-                int counter = 1;
-                boolean tryNext = true;
-                while(tryNext){
-                    int deltax = (i/2)*(2*(i%2)-1)*counter;
-                    int deltay = (i/2-1)*(2*(i%2)-1)*counter;
-                    ChessPosition destination = new ChessPosition(x+deltax, y+deltay);
-                    int validCode = validDestination(board, destination);
-                    if(validCode==0 || validCode==1){
-                        tryNext = false;
-                    }
-                    if(validCode==1 || validCode==2){
-                        moves.add(new ChessMove(myPosition, destination, null));
-                    }
-                    counter++;
-                }
-            }
         } else if (type == PieceType.ROOK) {
-            for(int i=0; i<4;i++){
-                int counter = 1;
-                boolean tryNext = true;
-                while(tryNext){
-                    int deltax = (i/2)*(2*(i%2)-1)*counter;
-                    int deltay = (i/2-1)*(2*(i%2)-1)*counter;
-                    ChessPosition destination = new ChessPosition(x+deltax, y+deltay);
-                    int validCode = validDestination(board, destination);
-                    if(validCode==0 || validCode==1){
-                        tryNext = false;
-                    }
-                    if(validCode==1 || validCode==2){
-                        moves.add(new ChessMove(myPosition, destination, null));
-                    }
-                    counter++;
-                }
-            }
+            moves = checkStraights(board, myPosition);
         }
         return moves;
     }

@@ -1,4 +1,4 @@
-package Result;
+package result;
 
 public record ClearResult(Integer statusNumber, String message) {
     public ClearResult removeStatusNumber(){
