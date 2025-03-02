@@ -28,6 +28,7 @@ public class Server {
         Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
+        Spark.delete("/session", this::logout);
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();
@@ -51,6 +52,7 @@ public class Server {
 
     private Object clear(Request req, Response res){
         ClearResult clearResult = clearService.clear();
+        System.out.println(clearResult.statusNumber());
         res.status(clearResult.statusNumber());
         clearResult = clearResult.removeStatusNumber();
         return new Gson().toJson(clearResult);
@@ -62,5 +64,13 @@ public class Server {
         res.status(loginResult.statusNumber());
         loginResult = loginResult.removeStatusNumber();
         return new Gson().toJson(loginResult);
+    }
+
+    private Object logout(Request req, Response res){
+        LogoutRequest logoutRequest = new LogoutRequest(req.headers("authorization"));
+        LogoutResult logoutResult = userService.logout(logoutRequest);
+        res.status(logoutResult.statusNumber());
+        logoutResult = logoutResult.removeStatusNumber();
+        return new Gson().toJson(logoutResult);
     }
 }

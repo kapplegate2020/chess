@@ -22,7 +22,7 @@ public class ClearService {
             userDataAccess.clear();
             gameDataAccess.clear();
             authDataAccess.clear();
-            return new ClearResult(null, null);
+            return new ClearResult(200, null);
         }
         catch (DataAccessException e){
             return new ClearResult(500, e.getMessage());
