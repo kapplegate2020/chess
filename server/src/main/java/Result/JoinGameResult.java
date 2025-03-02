@@ -1,7 +1,7 @@
 package Result;
 
 public record JoinGameResult(Integer statusNumber, String message) {
-    public JoinGameResult clearStatusNumber(){
+    public JoinGameResult removeStatusNumber(){
         return new JoinGameResult(null, message);
     }
 }
