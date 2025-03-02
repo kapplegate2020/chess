@@ -1,7 +1,12 @@
 package service;
 
+import Request.CreateGameRequest;
+import Request.JoinGameRequest;
 import Request.ListGamesRequest;
+import Result.CreateGameResult;
+import Result.JoinGameResult;
 import Result.ListGamesResult;
+import chess.ChessGame;
 import dataAccess.*;
 import model.AuthData;
 import model.GameData;
@@ -51,6 +56,88 @@ public class GameServiceTests {
         assert listGamesResult.statusNumber() == 401;
         assert listGamesResult.gameList() == null;
         assert listGamesResult.message().equals("Error: unauthorized");
+    }
+
+    @Test
+    public void createGameSuccess(){
+        String authToken = UserService.generateToken();
+        try{
+            AuthData authData = new AuthData(authToken, "Sammy");
+            authDataAccess.createAuth(authData);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        CreateGameRequest createGameRequest = new CreateGameRequest(authToken, "Stevie's Game");
+        CreateGameResult createGameResult = gameService.createGame(createGameRequest);
+        assert createGameResult.statusNumber() == 200;
+        assert createGameResult.gameID() != null;
+        try{
+            GameData gameData = gameDataAccess.getGame(createGameResult.gameID());
+            assert gameData != null;
+            assert gameData.gameName().equals("Stevie's Game");
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void createGameFailure(){
+        String authToken = UserService.generateToken();
+        CreateGameRequest createGameRequest = new CreateGameRequest(authToken, "myGame");
+        CreateGameResult createGameResult = gameService.createGame(createGameRequest);
+        assert createGameResult.statusNumber() == 401;
+        assert createGameResult.gameID() == null;
+        assert createGameResult.message().equals("Error: unauthorized");
+    }
+
+    @Test
+    public void joinGameSuccess(){
+        String authToken = UserService.generateToken();
+        try{
+            AuthData authData = new AuthData(authToken, "Sammy");
+            authDataAccess.createAuth(authData);
+            GameData gameData = new GameData(0, null, "Jerry", "theGame", null);
+            gameDataAccess.createGame(gameData);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, 0, ChessGame.TeamColor.WHITE);
+        JoinGameResult joinGameResult = gameService.joinGame(joinGameRequest);
+        assert joinGameResult.statusNumber() == 200;
+        try{
+            GameData gameData = gameDataAccess.getGame(0);
+            assert gameData != null;
+            assert gameData.gameName().equals("theGame");
+            assert gameData.whiteUsername().equals("Sammy");
+            assert gameData.blackUsername().equals("Jerry");
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void joinGameFailure(){
+        String authToken = UserService.generateToken();
+        try{
+            AuthData authData = new AuthData(authToken, "Sammy");
+            authDataAccess.createAuth(authData);
+            GameData gameData = new GameData(543, "Sarah", null, "theCoolGame", null);
+            gameDataAccess.createGame(gameData);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, 543, ChessGame.TeamColor.WHITE);
+        JoinGameResult joinGameResult = gameService.joinGame(joinGameRequest);
+        assert joinGameResult.statusNumber() == 403;
+        try{
+            GameData gameData = gameDataAccess.getGame(543);
+            assert gameData != null;
+            assert gameData.gameName().equals("theCoolGame");
+            assert gameData.whiteUsername().equals("Sarah");
+            assert gameData.blackUsername() == null;
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
