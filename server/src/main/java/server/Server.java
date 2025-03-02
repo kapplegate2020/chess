@@ -73,4 +73,30 @@ public class Server {
         logoutResult = logoutResult.removeStatusNumber();
         return new Gson().toJson(logoutResult);
     }
+
+    private Object listGames(Request req, Response res){
+        ListGamesRequest listGamesRequest = new ListGamesRequest(req.headers("authorization"));
+        ListGamesResult listGamesResult = gameService.listGames(listGamesRequest);
+        res.status(listGamesResult.statusNumber());
+        listGamesResult = listGamesResult.removeStatusNumber();
+        return new Gson().toJson(listGamesResult);
+    }
+
+    private Object createGame(Request req, Response res){
+        CreateGameRequest createGameRequest = new Gson().fromJson(req.body(), CreateGameRequest.class);
+        createGameRequest = createGameRequest.addAuthToken(req.headers("authorization"));
+        CreateGameResult createGameResult = gameService.createGame(createGameRequest);
+        res.status(createGameResult.statusNumber());
+        createGameResult = createGameResult.removeStatusNumber();
+        return new Gson().toJson(createGameResult);
+    }
+
+    private Object joinGame(Request req, Response res){
+        JoinGameRequest joinGameRequest = new Gson().fromJson(req.body(), JoinGameRequest.class);
+        joinGameRequest = joinGameRequest.addAuthToken(req.headers("authorization"));
+        JoinGameResult joinGameResult = gameService.joinGame(joinGameRequest);
+        res.status(joinGameResult.statusNumber());
+        joinGameResult = joinGameResult.removeStatusNumber();
+        return new Gson().toJson(joinGameResult);
+    }
 }
