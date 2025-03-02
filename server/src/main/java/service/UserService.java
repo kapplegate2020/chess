@@ -1,6 +1,8 @@
 package service;
 
+import Request.LoginRequest;
 import Request.RegisterRequest;
+import Result.LoginResult;
 import Result.RegisterResult;
 import dataAccess.AuthDataAccess;
 import dataAccess.DataAccessException;
@@ -40,6 +42,27 @@ public class UserService {
         }
         catch (DataAccessException e){
             return new RegisterResult(null, null, 500, e.getMessage());
+        }
+    }
+
+    public LoginResult login(LoginRequest loginRequest){
+        try{
+            String username = loginRequest.username();
+            String password = loginRequest.password();
+            UserData userData = userDataAccess.getUser(username);
+            if(userData == null){
+                return new LoginResult(null, null, 401, "Error: unauthorized");
+            }
+            if(!password.equals(userData.password())){
+                return new LoginResult(null, null, 401, "Error: unauthorized");
+            }
+            String authToken = generateToken();
+            AuthData authData = new AuthData(authToken, username);
+            authDataAccess.createAuth(authData);
+            return new LoginResult(username, authToken, 200, null);
+        }
+        catch (DataAccessException e) {
+            return new LoginResult(null, null, 500, e.getMessage());
         }
     }
 

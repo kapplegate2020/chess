@@ -40,6 +40,7 @@ public class Server {
         var registerRequest = new Gson().fromJson(req.body(), RegisterRequest.class);
         RegisterResult registerResult = userService.register(registerRequest);
         res.status(registerResult.statusNumber());
+        registerResult = registerResult.removeStatusNumber();
         return new Gson().toJson(registerResult);
     }
 }
