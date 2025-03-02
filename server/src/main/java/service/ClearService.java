@@ -1,10 +1,10 @@
 package service;
 
 import result.ClearResult;
-import dataAccess.AuthDataAccess;
-import dataAccess.DataAccessException;
-import dataAccess.GameDataAccess;
-import dataAccess.UserDataAccess;
+import dataaccess.AuthDataAccess;
+import dataaccess.DataAccessException;
+import dataaccess.GameDataAccess;
+import dataaccess.UserDataAccess;
 
 public class ClearService {
     private final UserDataAccess userDataAccess;

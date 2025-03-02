@@ -6,9 +6,9 @@ import request.RegisterRequest;
 import result.LoginResult;
 import result.LogoutResult;
 import result.RegisterResult;
-import dataAccess.AuthDataAccess;
-import dataAccess.DataAccessException;
-import dataAccess.UserDataAccess;
+import dataaccess.AuthDataAccess;
+import dataaccess.DataAccessException;
+import dataaccess.UserDataAccess;
 import model.AuthData;
 import model.UserData;
 

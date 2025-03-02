@@ -5,7 +5,7 @@ import request.RegisterRequest;
 import result.*;
 import request.*;
 import com.google.gson.Gson;
-import dataAccess.*;
+import dataaccess.*;
 import service.ClearService;
 import service.GameService;
 import service.UserService;

@@ -7,9 +7,9 @@ import result.CreateGameResult;
 import result.JoinGameResult;
 import result.ListGamesResult;
 import chess.ChessGame;
-import dataAccess.AuthDataAccess;
-import dataAccess.DataAccessException;
-import dataAccess.GameDataAccess;
+import dataaccess.AuthDataAccess;
+import dataaccess.DataAccessException;
+import dataaccess.GameDataAccess;
 import model.AuthData;
 import model.GameData;
 

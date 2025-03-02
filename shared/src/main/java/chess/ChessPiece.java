@@ -158,6 +158,21 @@ public class ChessPiece {
         return moves;
     }
 
+    private ArrayList<ChessMove> promotionMoves(ChessPosition myPosition, ChessPosition destination, int last){
+        ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
+        int x = destination.getRow();
+        if(x != last){
+            moves.add(new ChessMove(myPosition, destination, null));
+        }
+        else {
+            moves.add(new ChessMove(myPosition, destination, PieceType.BISHOP));
+            moves.add(new ChessMove(myPosition, destination, PieceType.KNIGHT));
+            moves.add(new ChessMove(myPosition, destination, PieceType.QUEEN));
+            moves.add(new ChessMove(myPosition, destination, PieceType.ROOK));
+        }
+        return moves;
+    }
+
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -218,15 +233,7 @@ public class ChessPiece {
                 ChessPosition destination = new ChessPosition(x+direction, y+i);
                 int validCode = validDestination(board, destination);
                 if(validCode==1){
-                    if(x+direction != last){
-                        moves.add(new ChessMove(myPosition, destination, null));
-                    }
-                    else{
-                        moves.add(new ChessMove(myPosition, destination, PieceType.BISHOP));
-                        moves.add(new ChessMove(myPosition, destination, PieceType.KNIGHT));
-                        moves.add(new ChessMove(myPosition, destination, PieceType.QUEEN));
-                        moves.add(new ChessMove(myPosition, destination, PieceType.ROOK));
-                    }
+                    moves.addAll(promotionMoves(myPosition, destination, last));
                 }
             }
 
@@ -234,15 +241,7 @@ public class ChessPiece {
             ChessPosition destination = new ChessPosition(x+direction, y);
             int validCode = validDestination(board, destination);
             if(validCode==2){
-                if(x+direction != last){
-                    moves.add(new ChessMove(myPosition, destination, null));
-                }
-                else {
-                    moves.add(new ChessMove(myPosition, destination, PieceType.BISHOP));
-                    moves.add(new ChessMove(myPosition, destination, PieceType.KNIGHT));
-                    moves.add(new ChessMove(myPosition, destination, PieceType.QUEEN));
-                    moves.add(new ChessMove(myPosition, destination, PieceType.ROOK));
-                }
+                moves.addAll(promotionMoves(myPosition, destination, last));
             }
 
             //check 2 spaces forward
