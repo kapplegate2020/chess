@@ -14,6 +14,7 @@ public class MemoryGameDataAccess implements GameDataAccess{
             if(games.containsKey(gameData.gameID())){
                 throw new DataAccessException("GameID is already taken.");
             }
+            games.put(gameData.gameID(), gameData);
         }
         catch (Exception e){
             throw new DataAccessException(e.getMessage());
