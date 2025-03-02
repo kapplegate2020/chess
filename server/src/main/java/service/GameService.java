@@ -61,6 +61,9 @@ public class GameService {
     }
 
     public JoinGameResult joinGame(JoinGameRequest joinGameRequest){
+        if(joinGameRequest.gameID()==null){
+            return new JoinGameResult(400, "Error: bad request");
+        }
         try{
             String authToken = joinGameRequest.authToken();
             AuthData authData = authDataAccess.getAuth(authToken);
@@ -71,12 +74,16 @@ public class GameService {
             if(gameData == null){
                 return new JoinGameResult(400, "Error: bad request");
             }
-            if(joinGameRequest.playerColor() == ChessGame.TeamColor.BLACK && gameData.blackUsername()==null){
+            ChessGame.TeamColor playerColor = joinGameRequest.playerColor();
+            if(playerColor!= ChessGame.TeamColor.BLACK && playerColor != ChessGame.TeamColor.WHITE){
+                return new JoinGameResult(400, "Error: bad request");
+            }
+            if(playerColor == ChessGame.TeamColor.BLACK && gameData.blackUsername()==null){
                 gameData = gameData.addBlackUsername(authData.username());
                 gameDataAccess.updateGame(gameData);
                 return new JoinGameResult(200, null);
             }
-            if(joinGameRequest.playerColor() == ChessGame.TeamColor.WHITE && gameData.whiteUsername()==null){
+            if(playerColor == ChessGame.TeamColor.WHITE && gameData.whiteUsername()==null){
                 gameData = gameData.addWhiteUsername(authData.username());
                 gameDataAccess.updateGame(gameData);
                 return new JoinGameResult(200, null);

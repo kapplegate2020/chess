@@ -28,6 +28,9 @@ public class UserService {
     }
 
     public RegisterResult register(RegisterRequest registerRequest){
+        if(registerRequest.password()==null){
+            return new RegisterResult(null, null, 400, "Error: bad request");
+        }
         try {
             if (userDataAccess.getUser(registerRequest.username()) == null) {
                 String username = registerRequest.username();

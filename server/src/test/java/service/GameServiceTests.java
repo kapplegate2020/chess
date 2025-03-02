@@ -44,8 +44,8 @@ public class GameServiceTests {
         ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
         ListGamesResult listGamesResult = gameService.listGames(listGamesRequest);
         assert listGamesResult.statusNumber() == 200;
-        assert listGamesResult.gameList().getFirst().gameID() == 4;
-        assert listGamesResult.gameList().get(1).gameID() == 6;
+        assert listGamesResult.games().getFirst().gameID() == 4;
+        assert listGamesResult.games().get(1).gameID() == 6;
     }
 
     @Test
@@ -54,7 +54,7 @@ public class GameServiceTests {
         ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
         ListGamesResult listGamesResult = gameService.listGames(listGamesRequest);
         assert listGamesResult.statusNumber() == 401;
-        assert listGamesResult.gameList() == null;
+        assert listGamesResult.games() == null;
         assert listGamesResult.message().equals("Error: unauthorized");
     }
 
