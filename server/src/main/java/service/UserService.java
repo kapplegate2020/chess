@@ -1,8 +1,10 @@
 package service;
 
 import Request.LoginRequest;
+import Request.LogoutRequest;
 import Request.RegisterRequest;
 import Result.LoginResult;
+import Result.LogoutResult;
 import Result.RegisterResult;
 import dataAccess.AuthDataAccess;
 import dataAccess.DataAccessException;
@@ -63,6 +65,21 @@ public class UserService {
         }
         catch (DataAccessException e) {
             return new LoginResult(null, null, 500, e.getMessage());
+        }
+    }
+
+    public LogoutResult logout(LogoutRequest logoutRequest){
+        try{
+            String authToken = logoutRequest.authToken();
+            AuthData authData = authDataAccess.getAuth(authToken);
+            if(authData == null){
+                return new LogoutResult(401, "Error: unauthorized");
+            }
+            authDataAccess.deleteAuth(authData);
+            return new LogoutResult(200, null);
+        }
+        catch (DataAccessException e) {
+            return new LogoutResult(500, e.getMessage());
         }
     }
 

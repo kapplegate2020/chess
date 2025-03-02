@@ -1,8 +1,10 @@
 package service;
 
 import Request.LoginRequest;
+import Request.LogoutRequest;
 import Request.RegisterRequest;
 import Result.LoginResult;
+import Result.LogoutResult;
 import Result.RegisterResult;
 import dataAccess.*;
 import model.AuthData;
@@ -26,7 +28,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void registerTestSuccess(){
+    public void registerSuccess(){
         RegisterRequest registerRequest = new RegisterRequest("Jimmy", "test1234", "me@fake.com");
         RegisterResult registerResult = userService.register(registerRequest);
         assert registerResult.statusNumber() == 200;
@@ -47,7 +49,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void registerTestFailure(){
+    public void registerFailure(){
         try{
             UserData userData = new UserData("Jimmy", "fakepass", "fake@email.com");
             userDataAccess.createUser(userData);
@@ -72,7 +74,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void loginTestSuccess(){
+    public void loginSuccess(){
         try{
             UserData userData = new UserData("Johnny", "thisSafe12", "fake@email.com");
             userDataAccess.createUser(userData);
@@ -94,7 +96,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void loginTestFailure(){
+    public void loginFailure(){
         try{
             UserData userData = new UserData("Johnny", "thisSafe12", "fake@email.com");
             userDataAccess.createUser(userData);
@@ -109,5 +111,34 @@ public class UserServiceTests {
         LoginResult loginResult2 = userService.login(loginRequest2);
         assert loginResult2.statusNumber() == 401;
         assert loginResult2.message().equals("Error: unauthorized");
+    }
+
+    @Test
+    public void logoutSuccess(){
+        String authToken = UserService.generateToken();
+        try{
+            AuthData authData = new AuthData(authToken, "Joey");
+            authDataAccess.createAuth(authData);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        LogoutRequest logoutRequest = new LogoutRequest(authToken);
+        LogoutResult logoutResult = userService.logout(logoutRequest);
+        assert logoutResult.statusNumber() == 200;
+        try{
+            AuthData authData = authDataAccess.getAuth(authToken);
+            assert authData == null;
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void logoutFailure(){
+        String authToken = UserService.generateToken();
+        LogoutRequest logoutRequest = new LogoutRequest(authToken);
+        LogoutResult logoutResult = userService.logout(logoutRequest);
+        assert logoutResult.statusNumber() == 401;
+        assert logoutResult.message().equals("Error: unauthorized");
     }
 }
