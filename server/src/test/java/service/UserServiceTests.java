@@ -1,13 +1,14 @@
 package service;
 
+import Request.LoginRequest;
 import Request.RegisterRequest;
+import Result.LoginResult;
 import Result.RegisterResult;
 import dataAccess.*;
+import model.AuthData;
 import model.UserData;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import server.Server;
 
 public class UserServiceTests {
     UserDataAccess userDataAccess = new MemoryUserDataAccess();
@@ -37,6 +38,9 @@ public class UserServiceTests {
             assert userData.username().equals("Jimmy");
             assert userData.password().equals("test1234");
             assert userData.email().equals("me@fake.com");
+            AuthData authData = authDataAccess.getAuth(registerResult.authToken());
+            assert authData != null;
+            assert authData.username().equals("Jimmy");
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -65,5 +69,45 @@ public class UserServiceTests {
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Test
+    public void loginTestSuccess(){
+        try{
+            UserData userData = new UserData("Johnny", "thisSafe12", "fake@email.com");
+            userDataAccess.createUser(userData);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        LoginRequest loginRequest = new LoginRequest("Johnny", "thisSafe12");
+        LoginResult loginResult = userService.login(loginRequest);
+        assert loginResult.statusNumber() == 200;
+        assert loginResult.username().equals("Johnny");
+        assert loginResult.authToken() != null;
+        try{
+            AuthData authData = authDataAccess.getAuth(loginResult.authToken());
+            assert authData != null;
+            assert authData.username().equals("Johnny");
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void loginTestFailure(){
+        try{
+            UserData userData = new UserData("Johnny", "thisSafe12", "fake@email.com");
+            userDataAccess.createUser(userData);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        LoginRequest loginRequest = new LoginRequest("Johnny", "wrongPassword");
+        LoginResult loginResult = userService.login(loginRequest);
+        assert loginResult.statusNumber() == 401;
+        assert loginResult.message().equals("Error: unauthorized");
+        LoginRequest loginRequest2 = new LoginRequest("Jane", "thisSafe12");
+        LoginResult loginResult2 = userService.login(loginRequest2);
+        assert loginResult2.statusNumber() == 401;
+        assert loginResult2.message().equals("Error: unauthorized");
     }
 }
