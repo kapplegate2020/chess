@@ -18,6 +18,17 @@ public class DbUserDataAccess implements  UserDataAccess{
         catch (Exception e){
             throw new DataAccessException(e.getMessage());
         }
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1, userData.username());
+                preparedStatement.setString(2, userData.password());
+                preparedStatement.setString(3, userData.email());
+                preparedStatement.executeQuery();
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     @Override
@@ -45,7 +56,7 @@ public class DbUserDataAccess implements  UserDataAccess{
 
     public void configureDatabase() throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            String configureStatement = """
+            String statement = """
                     CREATE TABLE IF NOT EXISTS user (
                         `username` varchar(256) NOT NULL,
                         `password` varchar(256) NOT NULL,
@@ -53,7 +64,7 @@ public class DbUserDataAccess implements  UserDataAccess{
                         PRIMARY KEY (`username`)
                     )
                     """;
-            try (var preparedStatement = conn.prepareStatement(configureStatement)) {
+            try (var preparedStatement = conn.prepareStatement(statement)) {
                 var rs = preparedStatement.executeQuery();
                 rs.next();
                 System.out.println(rs.getInt(1));
