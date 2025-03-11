@@ -20,13 +20,21 @@ public class DbGameDataAccess implements GameDataAccess{
 
     @Override
     public void createGame(GameData gameData) throws DataAccessException {
-        try{
-            if(games.containsKey(gameData.gameID())){
-                throw new DataAccessException("GameID is already taken.");
-            }
-            games.put(gameData.gameID(), gameData);
+        if(getGame(gameData.gameID()) != null){
+            throw new DataAccessException("GameID is already taken.");
         }
-        catch (Exception e){
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
+            try (var insertPreparedStatement = conn.prepareStatement(statement)) {
+                insertPreparedStatement.setInt(1, gameData.gameID());
+                insertPreparedStatement.setString(2, gameData.whiteUsername());
+                insertPreparedStatement.setString(3, gameData.blackUsername());
+                insertPreparedStatement.setString(4, gameData.gameName());
+                String chessGame = new Gson().toJson(gameData.game());
+                insertPreparedStatement.setString(5, chessGame);
+                insertPreparedStatement.executeUpdate();
+            }
+        } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
         }
     }
@@ -81,10 +89,12 @@ public class DbGameDataAccess implements GameDataAccess{
 
     @Override
     public void clear()  throws DataAccessException {
-        try {
-            games.clear();
-        }
-        catch(Exception e){
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "TRUNCATE game";
+            try (var insertPreparedStatement = conn.prepareStatement(statement)) {
+                insertPreparedStatement.executeUpdate();
+            }
+        } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
         }
     }
