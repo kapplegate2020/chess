@@ -12,7 +12,7 @@ import service.UserService;
 import spark.*;
 
 public class Server {
-    private final UserDataAccess userDataAccess = new MemoryUserDataAccess();
+    private final UserDataAccess userDataAccess = new DbUserDataAccess();
     private final GameDataAccess gameDataAccess = new MemoryGameDataAccess();
     private final AuthDataAccess authDataAccess = new MemoryAuthDataAccess();
     private final UserService userService = new UserService(userDataAccess, authDataAccess);
