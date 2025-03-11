@@ -1,11 +1,19 @@
 package dataaccess;
 
 import model.UserData;
-
 import java.util.HashMap;
+import java.sql.*;
 
 public class DbUserDataAccess implements  UserDataAccess{
     HashMap<String, UserData> users = new HashMap<String, UserData>();
+
+    public DbUserDataAccess(){
+        try{
+            configureDatabase();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
@@ -18,7 +26,7 @@ public class DbUserDataAccess implements  UserDataAccess{
                 insertPreparedStatement.setString(1, userData.username());
                 insertPreparedStatement.setString(2, userData.password());
                 insertPreparedStatement.setString(3, userData.email());
-                insertPreparedStatement.executeQuery();
+                insertPreparedStatement.executeUpdate();
             }
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
@@ -56,6 +64,7 @@ public class DbUserDataAccess implements  UserDataAccess{
     }
 
     public void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
             String statement = """
                     CREATE TABLE IF NOT EXISTS user (
@@ -66,9 +75,7 @@ public class DbUserDataAccess implements  UserDataAccess{
                     )
                     """;
             try (var preparedStatement = conn.prepareStatement(statement)) {
-                var rs = preparedStatement.executeQuery();
-                rs.next();
-                System.out.println(rs.getInt(1));
+                preparedStatement.executeUpdate();
             }
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
