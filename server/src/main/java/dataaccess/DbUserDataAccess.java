@@ -9,22 +9,16 @@ public class DbUserDataAccess implements  UserDataAccess{
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-        try {
-            if (users.containsKey(userData.username())) {
-                throw new DataAccessException("Username Taken");
-            }
-            users.put(userData.username(), userData);
-        }
-        catch (Exception e){
-            throw new DataAccessException(e.getMessage());
+        if(getUser(userData.username()) != null){
+            throw new DataAccessException("Username Taken");
         }
         try (var conn = DatabaseManager.getConnection()) {
             String statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-            try (var preparedStatement = conn.prepareStatement(statement)) {
-                preparedStatement.setString(1, userData.username());
-                preparedStatement.setString(2, userData.password());
-                preparedStatement.setString(3, userData.email());
-                preparedStatement.executeQuery();
+            try (var insertPreparedStatement = conn.prepareStatement(statement)) {
+                insertPreparedStatement.setString(1, userData.username());
+                insertPreparedStatement.setString(2, userData.password());
+                insertPreparedStatement.setString(3, userData.email());
+                insertPreparedStatement.executeQuery();
             }
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
@@ -33,13 +27,20 @@ public class DbUserDataAccess implements  UserDataAccess{
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        try{
-            if(users.containsKey(username)){
-                return users.get(username);
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT username, password, email FROM user WHERE username=?";
+            try (var preparedStatement = conn.prepareStatement(statement)){
+                preparedStatement.setString(1, username);
+                try (var rs = preparedStatement.executeQuery()){
+                    if(rs.next()){
+                        return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
+                    }
+                    else{
+                        return null;
+                    }
+                }
             }
-            return null;
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
         }
     }
