@@ -39,6 +39,26 @@ public class UserDataAccessTest {
     }
 
     @Test
+    public void getUserFailure(){
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "INSERT INTO user (username, password, email) VALUES ('Andy', 'passw0rd', 'fake@mail.com')";
+            try (var insertPreparedStatement = conn.prepareStatement(statement)) {
+                insertPreparedStatement.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        try{
+            UserData userData = userDataAccess.getUser("Dave");
+            assert userData == null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    @Test
     public void createUserSuccess(){
         UserData userData = new UserData("Adam", "secure12", "email@email.com");
         try {
@@ -49,6 +69,27 @@ public class UserDataAccessTest {
             assert returnedUserData.email().equals("email@email.com");
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+
+    @Test
+    public void createUserFailure(){
+        UserData userData = new UserData("Adam", "secure12", "email@email.com");
+        String errorMessage = "";
+        try {
+            userDataAccess.createUser(userData);
+        } catch (DataAccessException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        try{
+            userDataAccess.createUser(userData);
+        } catch (DataAccessException e) {
+            errorMessage = e.getMessage();
+        }
+        finally {
+            assert errorMessage.equals("Username Taken");
         }
     }
 }
