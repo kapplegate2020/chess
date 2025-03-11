@@ -55,10 +55,12 @@ public class DbUserDataAccess implements  UserDataAccess{
 
     @Override
     public void clear()  throws DataAccessException {
-        try {
-            users.clear();
-        }
-        catch (Exception e){
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "TRUNCATE user";
+            try (var insertPreparedStatement = conn.prepareStatement(statement)) {
+                insertPreparedStatement.executeUpdate();
+            }
+        } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
         }
     }
