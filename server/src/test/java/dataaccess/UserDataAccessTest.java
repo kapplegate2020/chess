@@ -75,7 +75,7 @@ public class UserDataAccessTest {
 
     @Test
     public void createUserFailure(){
-        UserData userData = new UserData("Adam", "secure12", "email@email.com");
+        UserData userData = new UserData("Aaron", "securer7", "yep@em.com");
         String errorMessage = "";
         try {
             userDataAccess.createUser(userData);
@@ -90,6 +90,22 @@ public class UserDataAccessTest {
         }
         finally {
             assert errorMessage.equals("Username Taken");
+        }
+    }
+
+
+    @Test
+    public void clear(){
+        UserData userData = new UserData("Ammon", "myPass99", "chessPlayer@m.com");
+        try {
+            userDataAccess.createUser(userData);
+            UserData returnedUserData = userDataAccess.getUser("Ammon");
+            assert returnedUserData != null;
+            userDataAccess.clear();
+            returnedUserData = userDataAccess.getUser("Ammon");
+            assert returnedUserData == null;
+        } catch (DataAccessException ex) {
+            throw new RuntimeException(ex);
         }
     }
 }
