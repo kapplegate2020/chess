@@ -3,7 +3,6 @@ package dataaccess;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
-import model.UserData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -100,7 +99,7 @@ public class DbGameDataAccess implements GameDataAccess{
                         `blackUsername` varchar(256),
                         `gameName` varchar(256) NOT NULL,
                         `game` text,
-                        PRIMARY KEY (`username`)
+                        PRIMARY KEY (`gameID`)
                     )
                     """;
             try (var preparedStatement = conn.prepareStatement(statement)) {
