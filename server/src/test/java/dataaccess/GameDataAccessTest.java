@@ -5,6 +5,8 @@ import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
 public class GameDataAccessTest {
     GameDataAccess gameDataAccess = new DbGameDataAccess();
 
@@ -127,6 +129,37 @@ public class GameDataAccessTest {
             gameDataAccess.updateGame(gameData);
         } catch (DataAccessException ex) {
             assert ex.getMessage().equals("GameID does not exist.");
+        }
+    }
+
+    @Test
+    public void listGamesSuccess(){
+        GameData gameData1 = new GameData(334, null, null, "coolGame1", null);
+        GameData gameData2 = new GameData(341, null, "Shiblon", "coolGame2", null);
+        try {
+            gameDataAccess.createGame(gameData1);
+            gameDataAccess.createGame(gameData2);
+            ArrayList<GameData> games = gameDataAccess.listGames();
+            assert games.getFirst().gameID() == 334;
+            assert games.getFirst().whiteUsername() == null;
+            assert games.getFirst().blackUsername() == null;
+            assert games.getFirst().gameName().equals("coolGame1");
+            assert games.get(1).gameID() == 341;
+            assert games.get(1).whiteUsername() == null;
+            assert games.get(1).blackUsername().equals("Shiblon");
+            assert games.get(1).gameName().equals("coolGame2");
+        } catch (DataAccessException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    @Test
+    public void listGamesFailure(){
+        try {
+            ArrayList<GameData> games = gameDataAccess.listGames();
+            assert games == null;
+        } catch (DataAccessException ex) {
+            throw new RuntimeException(ex);
         }
     }
 }

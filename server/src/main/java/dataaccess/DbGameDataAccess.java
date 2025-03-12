@@ -41,10 +41,26 @@ public class DbGameDataAccess implements GameDataAccess{
 
     @Override
     public ArrayList<GameData> listGames() throws DataAccessException {
-        try{
-            return new ArrayList<GameData>(games.values());
-        }
-        catch (Exception e){
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game";
+            try (var preparedStatement = conn.prepareStatement(statement)){
+                try (var rs = preparedStatement.executeQuery()){
+                    ArrayList<GameData> games = new ArrayList<GameData>();
+                    while(rs.next()){
+                        int returnedGameID = rs.getInt("gameID");
+                        String whiteUsername = rs.getString("whiteUsername");
+                        String blackUsername = rs.getString("blackUsername");
+                        String gameName = rs.getString("gameName");
+                        ChessGame chessGame = new Gson().fromJson(rs.getString("game"), ChessGame.class);
+                        games.add(new GameData(returnedGameID, whiteUsername, blackUsername, gameName, chessGame));
+                    }
+                    if(games.isEmpty()){
+                        return null;
+                    }
+                    return games;
+                }
+            }
+        } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
         }
     }
