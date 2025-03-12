@@ -68,7 +68,7 @@ public class GameDataAccessTest {
 
 
     @Test
-    public void createUserFailure(){
+    public void createGameFailure(){
         GameData gameData = new GameData(15, null, "Seth", "coolGame2", null);
         String errorMessage = "";
         try {
@@ -85,6 +85,48 @@ public class GameDataAccessTest {
         }
         finally {
             assert errorMessage.equals("GameID is already taken.");
+        }
+    }
+
+
+    @Test
+    public void clear(){
+        GameData gameData = new GameData(111, "Simon", null, "thisName", null);
+        try {
+            gameDataAccess.createGame(gameData);
+            GameData returnedGameData = gameDataAccess.getGame(111);
+            assert returnedGameData != null;
+            gameDataAccess.clear();
+            returnedGameData = gameDataAccess.getGame(111);
+            assert returnedGameData == null;
+        } catch (DataAccessException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    @Test
+    public void updateGameSuccess(){
+        GameData gameData = new GameData(213, "Sean", null, "gameName", null);
+        GameData gameDataUpdate = new GameData(213, "Sean", "Silas", "gameName", null);
+        try {
+            gameDataAccess.createGame(gameData);
+            GameData returnedGameData = gameDataAccess.getGame(213);
+            assert returnedGameData.blackUsername() == null;
+            gameDataAccess.updateGame(gameDataUpdate);
+            returnedGameData = gameDataAccess.getGame(213);
+            assert returnedGameData.blackUsername().equals("Silas");
+        } catch (DataAccessException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    @Test
+    public void updateGameFailure(){
+        GameData gameData = new GameData(314, "Sebus", null, "betterGameName", null);
+        try {
+            gameDataAccess.updateGame(gameData);
+        } catch (DataAccessException ex) {
+            assert ex.getMessage().equals("GameID does not exist.");
         }
     }
 }

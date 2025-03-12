@@ -51,13 +51,21 @@ public class DbGameDataAccess implements GameDataAccess{
 
     @Override
     public void updateGame(GameData gameData) throws DataAccessException {
-        try{
-            if(!games.containsKey(gameData.gameID())){
-                throw new DataAccessException("GameID does not exist.");
-            }
-            games.put(gameData.gameID(), gameData);
+        if(getGame(gameData.gameID()) == null){
+            throw new DataAccessException("GameID does not exist.");
         }
-        catch (Exception e){
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?";
+            try (var insertPreparedStatement = conn.prepareStatement(statement)) {
+                insertPreparedStatement.setInt(5, gameData.gameID());
+                insertPreparedStatement.setString(1, gameData.whiteUsername());
+                insertPreparedStatement.setString(2, gameData.blackUsername());
+                insertPreparedStatement.setString(3, gameData.gameName());
+                String chessGame = new Gson().toJson(gameData.game());
+                insertPreparedStatement.setString(4, chessGame);
+                insertPreparedStatement.executeUpdate();
+            }
+        } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
         }
     }
