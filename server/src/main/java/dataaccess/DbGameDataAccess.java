@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class DbGameDataAccess implements GameDataAccess{
-    HashMap<Integer, GameData> games = new HashMap<Integer, GameData>();
 
     public DbGameDataAccess(){
         try {
