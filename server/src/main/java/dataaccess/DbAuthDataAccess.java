@@ -56,15 +56,16 @@ public class DbAuthDataAccess implements AuthDataAccess{
 
     @Override
     public void deleteAuth(AuthData authData) throws DataAccessException {
-        try{
-            if(auths.containsKey(authData.authToken())){
-                auths.remove(authData.authToken());
-            }
-            else{
-                throw new DataAccessException("AuthData not found.");
-            }
+        if(getAuth(authData.authToken()) == null){
+            throw new DataAccessException("AuthData not found.");
         }
-        catch (Exception e){
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "DELETE FROM auth WHERE authToken = ?";
+            try (var insertPreparedStatement = conn.prepareStatement(statement)) {
+                insertPreparedStatement.setString(1, authData.authToken());
+                insertPreparedStatement.executeUpdate();
+            }
+        } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
         }
     }

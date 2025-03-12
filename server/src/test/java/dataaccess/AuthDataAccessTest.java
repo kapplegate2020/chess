@@ -1,7 +1,6 @@
 package dataaccess;
 
 import model.AuthData;
-import model.GameData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -48,13 +47,13 @@ public class AuthDataAccessTest {
     }
 
     @Test
-    public void createGameSuccess(){
+    public void createAuthSuccess(){
         AuthData authData = new AuthData("a123", "Dave");
         try {
             authDataAccess.createAuth(authData);
             AuthData returnedAuthData = authDataAccess.getAuth("a123");
-            assert authData.authToken().equals("a123");
-            assert authData.username().equals("Dave");
+            assert returnedAuthData.authToken().equals("a123");
+            assert returnedAuthData.username().equals("Dave");
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -62,7 +61,7 @@ public class AuthDataAccessTest {
 
 
     @Test
-    public void createGameFailure(){
+    public void createAuthFailure(){
         AuthData authData = new AuthData("C123", "Davie");
         String errorMessage = "";
         try {
@@ -79,6 +78,47 @@ public class AuthDataAccessTest {
         }
         finally {
             assert errorMessage.equals("AuthToken already used.");
+        }
+    }
+
+    @Test
+    public void deleteAuthSuccess(){
+        AuthData authData = new AuthData("D4321", "Davidham");
+        try {
+            authDataAccess.createAuth(authData);
+            AuthData returnedAuthData = authDataAccess.getAuth("D4321");
+            assert returnedAuthData != null;
+            authDataAccess.deleteAuth(authData);
+            returnedAuthData = authDataAccess.getAuth("D4321");
+            assert returnedAuthData == null;
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void deleteAuthFailure(){
+        AuthData authData = new AuthData("D314", "Davidhammer");
+        try {
+            authDataAccess.deleteAuth(authData);
+        } catch (DataAccessException e) {
+            assert e.getMessage().equals("AuthData not found.");
+        }
+    }
+
+
+    @Test
+    public void clear(){
+        AuthData authData = new AuthData("E55555", "Davideth");
+        try {
+            authDataAccess.createAuth(authData);
+            AuthData returnedAuthData = authDataAccess.getAuth("E55555");
+            assert returnedAuthData != null;
+            authDataAccess.clear();
+            returnedAuthData = authDataAccess.getAuth("E55555");
+            assert returnedAuthData == null;
+        } catch (DataAccessException ex) {
+            throw new RuntimeException(ex);
         }
     }
 }
