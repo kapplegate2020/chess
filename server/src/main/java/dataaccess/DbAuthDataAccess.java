@@ -1,6 +1,9 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import model.AuthData;
+import model.GameData;
 
 import java.util.HashMap;
 
@@ -16,26 +19,37 @@ public class DbAuthDataAccess implements AuthDataAccess{
 
     @Override
     public void createAuth(AuthData authData) throws DataAccessException {
-        try{
-            if(auths.containsKey(authData.authToken())){
-                throw new DataAccessException("AuthToken already used.");
-            }
-            auths.put(authData.authToken(), authData);
+        if(getAuth(authData.authToken()) != null){
+            throw new DataAccessException("AuthToken already used.");
         }
-        catch (Exception e){
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
+            try (var insertPreparedStatement = conn.prepareStatement(statement)) {
+                insertPreparedStatement.setString(1, authData.authToken());
+                insertPreparedStatement.setString(2, authData.username());
+                insertPreparedStatement.executeUpdate();
+            }
+        } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
         }
     }
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
-        try{
-            if(auths.containsKey(authToken)){
-                return auths.get(authToken);
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT authToken, username FROM auth WHERE authToken=?";
+            try (var preparedStatement = conn.prepareStatement(statement)){
+                preparedStatement.setString(1, authToken);
+                try (var rs = preparedStatement.executeQuery()){
+                    if(rs.next()){
+                        return new AuthData(rs.getString(1), rs.getString(2));
+                    }
+                    else{
+                        return null;
+                    }
+                }
             }
-            return null;
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
         }
     }
@@ -57,10 +71,12 @@ public class DbAuthDataAccess implements AuthDataAccess{
 
     @Override
     public void clear() throws DataAccessException {
-        try {
-            auths.clear();
-        }
-        catch (Exception e){
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "TRUNCATE auth";
+            try (var insertPreparedStatement = conn.prepareStatement(statement)) {
+                insertPreparedStatement.executeUpdate();
+            }
+        } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
         }
     }
