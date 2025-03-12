@@ -54,9 +54,6 @@ public class DbGameDataAccess implements GameDataAccess{
                         ChessGame chessGame = new Gson().fromJson(rs.getString("game"), ChessGame.class);
                         games.add(new GameData(returnedGameID, whiteUsername, blackUsername, gameName, chessGame));
                     }
-                    if(games.isEmpty()){
-                        return null;
-                    }
                     return games;
                 }
             }

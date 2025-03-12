@@ -157,7 +157,7 @@ public class GameDataAccessTest {
     public void listGamesFailure(){
         try {
             ArrayList<GameData> games = gameDataAccess.listGames();
-            assert games == null;
+            assert games.isEmpty();
         } catch (DataAccessException ex) {
             throw new RuntimeException(ex);
         }

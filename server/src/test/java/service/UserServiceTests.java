@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class UserServiceTests {
-    UserDataAccess userDataAccess = new MemoryUserDataAccess();
+    UserDataAccess userDataAccess = new DbUserDataAccess();
     AuthDataAccess authDataAccess = new MemoryAuthDataAccess();
     UserService userService = new UserService(userDataAccess, authDataAccess);
 
