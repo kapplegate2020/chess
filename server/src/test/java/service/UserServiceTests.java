@@ -1,5 +1,6 @@
 package service;
 
+import org.mindrot.jbcrypt.BCrypt;
 import request.LoginRequest;
 import request.LogoutRequest;
 import request.RegisterRequest;
@@ -14,7 +15,7 @@ import org.junit.jupiter.api.Test;
 
 public class UserServiceTests {
     UserDataAccess userDataAccess = new DbUserDataAccess();
-    AuthDataAccess authDataAccess = new MemoryAuthDataAccess();
+    AuthDataAccess authDataAccess = new DbAuthDataAccess();
     UserService userService = new UserService(userDataAccess, authDataAccess);
 
     @BeforeEach
@@ -38,7 +39,7 @@ public class UserServiceTests {
             UserData userData = userDataAccess.getUser("Jimmy");
             assert userData != null;
             assert userData.username().equals("Jimmy");
-            assert userData.password().equals("test1234");
+            assert BCrypt.checkpw("test1234", userData.password());
             assert userData.email().equals("me@fake.com");
             AuthData authData = authDataAccess.getAuth(registerResult.authToken());
             assert authData != null;
@@ -76,7 +77,7 @@ public class UserServiceTests {
     @Test
     public void loginSuccess(){
         try{
-            UserData userData = new UserData("Johnny", "thisSafe12", "fake@email.com");
+            UserData userData = new UserData("Johnny", BCrypt.hashpw("thisSafe12", BCrypt.gensalt()), "fake@email.com");
             userDataAccess.createUser(userData);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
@@ -98,7 +99,7 @@ public class UserServiceTests {
     @Test
     public void loginFailure(){
         try{
-            UserData userData = new UserData("Johnny", "thisSafe12", "fake@email.com");
+            UserData userData = new UserData("Johnny", BCrypt.hashpw("thisSafe12", BCrypt.gensalt()), "fake@email.com");
             userDataAccess.createUser(userData);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);

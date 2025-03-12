@@ -1,5 +1,6 @@
 package service;
 
+import org.mindrot.jbcrypt.BCrypt;
 import request.LoginRequest;
 import request.LogoutRequest;
 import request.RegisterRequest;
@@ -35,6 +36,7 @@ public class UserService {
             if (userDataAccess.getUser(registerRequest.username()) == null) {
                 String username = registerRequest.username();
                 String password = registerRequest.password();
+                password = BCrypt.hashpw(password, BCrypt.gensalt());
                 String email = registerRequest.email();
                 UserData userData = new UserData(username, password, email);
                 userDataAccess.createUser(userData);
@@ -58,7 +60,7 @@ public class UserService {
             if(userData == null){
                 return new LoginResult(null, null, 401, "Error: unauthorized");
             }
-            if(!password.equals(userData.password())){
+            if(!BCrypt.checkpw(password, userData.password())){
                 return new LoginResult(null, null, 401, "Error: unauthorized");
             }
             String authToken = generateToken();

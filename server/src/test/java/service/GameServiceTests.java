@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 
 public class GameServiceTests {
     GameDataAccess gameDataAccess = new DbGameDataAccess();
-    AuthDataAccess authDataAccess = new MemoryAuthDataAccess();
+    AuthDataAccess authDataAccess = new DbAuthDataAccess();
     GameService gameService = new GameService(gameDataAccess, authDataAccess);
 
     @BeforeEach

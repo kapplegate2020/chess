@@ -8,9 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class ClearTest {
-    UserDataAccess userDataAccess = new MemoryUserDataAccess();
-    GameDataAccess gameDataAccess = new MemoryGameDataAccess();
-    AuthDataAccess authDataAccess = new MemoryAuthDataAccess();
+    UserDataAccess userDataAccess = new DbUserDataAccess();
+    GameDataAccess gameDataAccess = new DbGameDataAccess();
+    AuthDataAccess authDataAccess = new DbAuthDataAccess();
     ClearService clearService = new ClearService(userDataAccess, gameDataAccess, authDataAccess);
 
     @BeforeEach
