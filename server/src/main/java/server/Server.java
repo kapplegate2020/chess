@@ -1,9 +1,9 @@
 package server;
 
-import request.RegisterRequest;
-
+import request.*;
 import com.google.gson.Gson;
 import dataaccess.*;
+import result.*;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
