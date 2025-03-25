@@ -5,6 +5,7 @@ import client.ServerFacade;
 import model.UserData;
 import request.LoginRequest;
 import request.RegisterRequest;
+import result.LoginResult;
 import result.RegisterResult;
 
 import java.util.Arrays;
@@ -63,6 +64,18 @@ public class LoggedOutClient implements Client{
         RegisterRequest registerRequest = new RegisterRequest(username, password, email);
         RegisterResult registerResult = serverFacade.register(registerRequest);
         repl.login(registerResult.authToken());
+        return "Successfully registered as "+username;
+    }
+
+    public String login(String[] params) throws ResponseException {
+        if(params.length != 2){
+            return "Invalid Syntax.";
+        }
+        String username = params[0];
+        String password = params[1];
+        LoginRequest loginRequest = new LoginRequest(username, password);
+        LoginResult loginResult = serverFacade.login(loginRequest);
+        repl.login(loginResult.authToken());
         return "Successfully registered as "+username;
     }
 

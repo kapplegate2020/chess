@@ -5,16 +5,12 @@ import java.util.Scanner;
 public class Repl {
     String serverURL;
     private Client client;
-    private LoggedInClient loggedInClient;
-    private LoggedOutClient loggedOutClient;
     boolean quit = false;
     String promptMessage = "[LOGGED OUT]";
 
     public Repl(String serverURL){
         this.serverURL = serverURL;
-        loggedOutClient = new LoggedOutClient(serverURL, this);
-        loggedInClient = new LoggedInClient(serverURL, this);
-        client = loggedOutClient;
+        client = new LoggedOutClient(serverURL, this);
     }
 
     public void run(){
@@ -33,13 +29,13 @@ public class Repl {
         }
     }
 
-    public void login(){
-        client = loggedInClient;
+    public void login(String authToken){
+        client = new LoggedInClient(serverURL, this, authToken);
         promptMessage = "[LOGGED IN]";
     }
 
     public void logout(){
-        client = loggedOutClient;
+        client = new LoggedOutClient(serverURL, this);
         promptMessage = "[LOGGED OUT]";
     }
 
