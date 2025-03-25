@@ -20,15 +20,15 @@ public class GameClient implements Client{
 
     @Override
     public String eval(String input){
+        if(input.equals("quit")){
+            repl.quit();
+            return "";
+        }
         return "Not yet implemented.";
     }
 
     @Override
     public String help(){
         return "help";
-    }
-
-    private void drawGame(){
-
     }
 }

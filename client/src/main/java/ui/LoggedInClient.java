@@ -112,24 +112,7 @@ public class LoggedInClient implements Client{
             return "Invalid Command.";
         }
 
-        int id;
-        try{
-            id = Integer.parseInt(params[0]);
-        } catch (NumberFormatException e) {
-            return "Not an integer";
-        }
-
-        if(gameIds == null){
-            return "Please list the games before trying to join.";
-        }
-
-        if(gameIds.isEmpty()){
-            return "There are no games currently. You can create a game.";
-        }
-
-        if(id<0 || id>=gameIds.size()){
-            return "Please enter a valid gameID";
-        }
+        int id = checkGameId(params[0]);
 
         ChessGame.TeamColor team = null;
         if(params[1].equals("white")){
@@ -154,26 +137,32 @@ public class LoggedInClient implements Client{
             return "Invalid Command.";
         }
 
+        int id = checkGameId(params[0]);
+
+        repl.joinGame(authToken, new ChessGame(), ChessGame.TeamColor.WHITE);
+        return "This feature is not fully implemented yet.";
+    }
+
+    private Integer checkGameId(String idStr) throws ResponseException{
         int id;
         try{
-            id = Integer.parseInt(params[0]);
+            id = Integer.parseInt(idStr);
         } catch (NumberFormatException e) {
-            return "Not an integer";
+            throw new ResponseException("Not an integer");
         }
 
         if(gameIds == null){
-            return "Please list the games before trying to join.";
+            throw new ResponseException("Please list the games before trying to join.");
         }
 
         if(gameIds.isEmpty()){
-            return "There are no games currently. You can create a game.";
+            throw new ResponseException("There are no games currently. You can create a game or list the games again.");
         }
 
-        if(id<0 || id>=gameIds.size()){
-            return "Please enter a valid gameID";
+        if(id<0 || id>= gameIds.size()){
+            throw new ResponseException("Game Id does not exist.");
         }
-        repl.joinGame(authToken, new ChessGame(), ChessGame.TeamColor.WHITE);
-        return "This feature is not fully implemented yet.";
+        return id;
     }
 
 

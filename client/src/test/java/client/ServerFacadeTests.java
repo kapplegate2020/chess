@@ -19,9 +19,9 @@ public class ServerFacadeTests {
 
     private static Server server;
     private static ServerFacade serverFacade;
-    private static final DbUserDataAccess userDataAccess = new DbUserDataAccess();
-    private static final DbGameDataAccess gameDataAccess = new DbGameDataAccess();
-    private static final DbAuthDataAccess authDataAccess = new DbAuthDataAccess();
+    private static final DbUserDataAccess USER_DATA_ACCESS = new DbUserDataAccess();
+    private static final DbGameDataAccess GAME_DATA_ACCESS = new DbGameDataAccess();
+    private static final DbAuthDataAccess AUTH_DATA_ACCESS = new DbAuthDataAccess();
 
     @BeforeAll
     public static void init() {
@@ -40,9 +40,9 @@ public class ServerFacadeTests {
     @BeforeEach
     void resetDb(){
         try {
-            userDataAccess.clear();
-            gameDataAccess.clear();
-            authDataAccess.clear();
+            USER_DATA_ACCESS.clear();
+            GAME_DATA_ACCESS.clear();
+            AUTH_DATA_ACCESS.clear();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -64,7 +64,7 @@ public class ServerFacadeTests {
     public void registerFailure() {
         UserData userData = new UserData("John", "pass", "email");
         try{
-            userDataAccess.createUser(userData);
+            USER_DATA_ACCESS.createUser(userData);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -81,7 +81,7 @@ public class ServerFacadeTests {
         try{
             //password is encrypted version of test1234
             UserData userData = new UserData("Johnny", "$2a$10$wecv.H9ZkuxxPd0iieNz/ufX4Dq8tx73LvpVlSlRF.B.YD4IfUMV6", "fake@email.com");
-            userDataAccess.createUser(userData);
+            USER_DATA_ACCESS.createUser(userData);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -100,7 +100,7 @@ public class ServerFacadeTests {
         try{
             //password is encrypted version of test1234
             UserData userData = new UserData("Johnny", "$2a$10$wecv.H9ZkuxxPd0iieNz/ufX4Dq8tx73LvpVlSlRF.B.YD4IfUMV6", "fake@email.com");
-            userDataAccess.createUser(userData);
+            USER_DATA_ACCESS.createUser(userData);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -117,7 +117,7 @@ public class ServerFacadeTests {
         String authToken = "exampleAuthToken1234";
         try{
             AuthData authData = new AuthData(authToken, "Joey");
-            authDataAccess.createAuth(authData);
+            AUTH_DATA_ACCESS.createAuth(authData);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -131,7 +131,7 @@ public class ServerFacadeTests {
         }
 
         try{
-            AuthData authData = authDataAccess.getAuth(authToken);
+            AuthData authData = AUTH_DATA_ACCESS.getAuth(authToken);
             assert authData == null;
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
@@ -153,12 +153,12 @@ public class ServerFacadeTests {
     public void listGamesSuccess(){
         String authToken = "exampleAuthToken1234";
         try{
-            AuthData authData = new AuthData(authToken, "Sammy");
-            authDataAccess.createAuth(authData);
-            GameData gameData1 = new GameData(4, "user1", null, "game", null);
-            GameData gameData2 = new GameData(6, null, "Gerald", "alsoagame", null);
-            gameDataAccess.createGame(gameData1);
-            gameDataAccess.createGame(gameData2);
+            AuthData authData = new AuthData(authToken, "Samster");
+            AUTH_DATA_ACCESS.createAuth(authData);
+            GameData gameData1 = new GameData(4, "user1", null, "game2", null);
+            GameData gameData2 = new GameData(13, null, "Geraldine", "alsoagame2", null);
+            GAME_DATA_ACCESS.createGame(gameData1);
+            GAME_DATA_ACCESS.createGame(gameData2);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -189,7 +189,7 @@ public class ServerFacadeTests {
         String authToken = "exampleAuthToken1234";
         try{
             AuthData authData = new AuthData(authToken, "Sammy");
-            authDataAccess.createAuth(authData);
+            AUTH_DATA_ACCESS.createAuth(authData);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -218,10 +218,10 @@ public class ServerFacadeTests {
     public void joinGameSuccess(){
         String authToken = "exampleAuthToken1234";
         try{
-            AuthData authData = new AuthData(authToken, "Sammy");
-            authDataAccess.createAuth(authData);
+            AuthData authData = new AuthData(authToken, "SamHam");
+            AUTH_DATA_ACCESS.createAuth(authData);
             GameData gameData = new GameData(0, null, "Jerry", "theGame", null);
-            gameDataAccess.createGame(gameData);
+            GAME_DATA_ACCESS.createGame(gameData);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -234,7 +234,7 @@ public class ServerFacadeTests {
         }
 
         try{
-            GameData gameData = gameDataAccess.getGame(0);
+            GameData gameData = GAME_DATA_ACCESS.getGame(0);
             assert gameData != null;
             assert gameData.gameName().equals("theGame");
             assert gameData.whiteUsername().equals("Sammy");
@@ -249,9 +249,9 @@ public class ServerFacadeTests {
         String authToken = "exampleAuthToken1234";
         try{
             AuthData authData = new AuthData(authToken, "Sammy");
-            authDataAccess.createAuth(authData);
+            AUTH_DATA_ACCESS.createAuth(authData);
             GameData gameData = new GameData(543, "Sarah", null, "theCoolGame", null);
-            gameDataAccess.createGame(gameData);
+            GAME_DATA_ACCESS.createGame(gameData);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }

@@ -6,7 +6,6 @@ import chess.ChessPosition;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.time.temporal.Temporal;
 import java.util.HashMap;
 import java.util.Map;
 
