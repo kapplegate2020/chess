@@ -57,4 +57,20 @@ public class ServerFacadeTests {
         }
     }
 
+    @Test
+    public void registerFailure() {
+        UserData userData = new UserData("John", "pass", "email");
+        try{
+            userDataAccess.createUser(userData);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        RegisterRequest registerRequest = new RegisterRequest("John", "test1234", "me@fake.com");
+        try{
+            RegisterResult registerResult = serverFacade.register(registerRequest);
+        } catch (ResponseException e) {
+            assert e.getMessage().equals("Error: already taken");
+        }
+    }
+
 }

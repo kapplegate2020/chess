@@ -3,14 +3,12 @@ package client;
 import com.google.gson.Gson;
 import request.RegisterRequest;
 import result.RegisterResult;
-import result.Result;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 public class ServerFacade {
     String url;
@@ -18,7 +16,8 @@ public class ServerFacade {
         this.url = url;
     }
 
-    public RegisterResult register(RegisterRequest registerRequest) throws Exception{
+    public RegisterResult register(RegisterRequest registerRequest) throws ResponseException{
+        RegisterResult result = new RegisterResult(null, null, null, null);
         return makeRequest("POST", "/user", registerRequest, RegisterResult.class);
 //        HttpURLConnection http = (HttpURLConnection) new URI(url+"/user").toURL().openConnection();
 //        http.setRequestMethod("POST");
@@ -38,7 +37,7 @@ public class ServerFacade {
 //        return registerResult;
     }
 
-    private Result makeRequest(String method, String path, Object request, Class<Result> responseClass) {
+    private  <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
             URI uri = new URI(url + path);
             HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
@@ -51,24 +50,26 @@ public class ServerFacade {
             }
             http.connect();
             int statusCode = http.getResponseCode();
-            Result result;
             if(statusCode/100 == 2){
+                T result = null;
                 try (InputStream respBody = http.getInputStream()) {
                     InputStreamReader inputStreamReader = new InputStreamReader(respBody);
                     result = new Gson().fromJson(inputStreamReader, responseClass);
                 }
+                return result;
             }
             else{
                 try (InputStream respError = http.getErrorStream()) {
                     InputStreamReader inputStreamReader = new InputStreamReader(respError);
-                    result = new Gson().fromJson(inputStreamReader, responseClass);
+                    ErrorHolder error = new Gson().fromJson(inputStreamReader, ErrorHolder.class);
+                    throw new ResponseException(error.message());
                 }
             }
-            result.addStatusNumber(statusCode);
-            return result;
         }
-        catch (Exception e){
-            return null;
+        catch (ResponseException e){
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseException("Unknown Error");
         }
     }
 
