@@ -39,7 +39,7 @@ public class LoggedInClient implements Client{
             case "logout" -> logout(params);
             case "create" -> createGame(params);
             case "list" -> listGames(params);
-            case "join" -> join(params);
+            case "join" -> joinGame(params);
             case "observe" -> observe(params);
             default -> help();
         };
@@ -145,6 +145,34 @@ public class LoggedInClient implements Client{
         JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, gameIds.get(id), team);
         serverFacade.joinGame(joinGameRequest);
         return "Successfully joined game "+id;
+    }
+
+
+    private String observe(String[] params) throws ResponseException{
+        if(params.length!=1){
+            return "Invalid Command.";
+        }
+
+        int id;
+        try{
+            id = Integer.parseInt(params[0]);
+        } catch (NumberFormatException e) {
+            return "Not an integer";
+        }
+
+        if(gameIds == null){
+            return "Please list the games before trying to join.";
+        }
+
+        if(gameIds.isEmpty()){
+            return "There are no games currently. You can create a game.";
+        }
+
+        if(id<0 || id>=gameIds.size()){
+            return "Please enter a valid gameID";
+        }
+
+        return "This feature is not implemented yet.";
     }
 
 
