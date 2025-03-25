@@ -8,10 +8,13 @@ import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import request.LoginRequest;
+import request.LogoutRequest;
 import request.RegisterRequest;
 import result.LoginResult;
+import result.LogoutResult;
 import result.RegisterResult;
 import server.Server;
+import service.UserService;
 
 
 public class ServerFacadeTests {
@@ -106,6 +109,43 @@ public class ServerFacadeTests {
         LoginRequest loginRequest = new LoginRequest("Johnny", "wrongPassword");
         try {
             LoginResult loginResult = serverFacade.login(loginRequest);
+        } catch (ResponseException e) {
+            assert e.getMessage().equals("Error: unauthorized");
+        }
+    }
+
+    @Test
+    public void logoutSuccess(){
+        String authToken = "exampleAuthToken1234";
+        try{
+            AuthData authData = new AuthData(authToken, "Joey");
+            authDataAccess.createAuth(authData);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        LogoutRequest logoutRequest = new LogoutRequest(authToken);
+        try {
+            LogoutResult logoutResult = serverFacade.logout(logoutRequest);
+        }
+        catch(ResponseException e){
+            throw new RuntimeException(e);
+        }
+
+        try{
+            AuthData authData = authDataAccess.getAuth(authToken);
+            assert authData == null;
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void logoutFailure(){
+        String authToken = UserService.generateToken();
+        LogoutRequest logoutRequest = new LogoutRequest(authToken);
+        try {
+            LogoutResult logoutResult = serverFacade.logout(logoutRequest);
         } catch (ResponseException e) {
             assert e.getMessage().equals("Error: unauthorized");
         }

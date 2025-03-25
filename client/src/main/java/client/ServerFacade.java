@@ -2,8 +2,10 @@ package client;
 
 import com.google.gson.Gson;
 import request.LoginRequest;
+import request.LogoutRequest;
 import request.RegisterRequest;
 import result.LoginResult;
+import result.LogoutResult;
 import result.RegisterResult;
 
 import java.io.InputStream;
@@ -19,20 +21,28 @@ public class ServerFacade {
     }
 
     public RegisterResult register(RegisterRequest registerRequest) throws ResponseException{
-        return makeRequest("POST", "/user", registerRequest, RegisterResult.class);
+        return makeRequest("POST", "/user", registerRequest, RegisterResult.class, null);
     }
 
     public LoginResult login(LoginRequest loginRequest) throws ResponseException{
-        return makeRequest("POST", "/session", loginRequest, LoginResult.class);
+        return makeRequest("POST", "/session", loginRequest, LoginResult.class, null);
     }
 
-    private  <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
+    public LogoutResult logout(LogoutRequest logoutRequest) throws ResponseException{
+        String authToken = logoutRequest.authToken();
+        return makeRequest("DELETE", "/session", logoutRequest, LogoutResult.class, authToken);
+    }
+
+    private  <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws ResponseException {
         try {
             URI uri = new URI(url + path);
             HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
             http.addRequestProperty("Content-Type", "application/json");
+            if(authToken!= null){
+                http.addRequestProperty("authorization", authToken);
+            }
             String reqData = new Gson().toJson(request);
             try (OutputStream reqBody = http.getOutputStream()){
                 reqBody.write(reqData.getBytes());
