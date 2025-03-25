@@ -15,6 +15,7 @@ public class GameClient implements Client{
         this.authToken = authToken;
         this.game = game;
         DrawGame draw = new DrawGame(game, viewPoint);
+        draw.draw();
     }
 
     @Override
