@@ -5,11 +5,14 @@ import dataaccess.DbAuthDataAccess;
 import dataaccess.DbGameDataAccess;
 import dataaccess.DbUserDataAccess;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
+import request.ListGamesRequest;
 import request.LoginRequest;
 import request.LogoutRequest;
 import request.RegisterRequest;
+import result.ListGamesResult;
 import result.LoginResult;
 import result.LogoutResult;
 import result.RegisterResult;
@@ -146,6 +149,41 @@ public class ServerFacadeTests {
         LogoutRequest logoutRequest = new LogoutRequest(authToken);
         try {
             LogoutResult logoutResult = serverFacade.logout(logoutRequest);
+        } catch (ResponseException e) {
+            assert e.getMessage().equals("Error: unauthorized");
+        }
+    }
+
+    @Test
+    public void listGamesSuccess(){
+        String authToken = "exampleAuthToken1234";
+        try{
+            AuthData authData = new AuthData(authToken, "Sammy");
+            authDataAccess.createAuth(authData);
+            GameData gameData1 = new GameData(4, "user1", null, "game", null);
+            GameData gameData2 = new GameData(6, null, "Gerald", "alsoagame", null);
+            gameDataAccess.createGame(gameData1);
+            gameDataAccess.createGame(gameData2);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
+        try {
+            ListGamesResult listGamesResult = serverFacade.listGames(listGamesRequest);
+            assert listGamesResult.games().getFirst().gameID() == 4;
+            assert listGamesResult.games().get(1).gameID() == 6;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void listGamesFailure(){
+        String authToken = "exampleAuthToken1234";
+        ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
+        try {
+            ListGamesResult listGamesResult = serverFacade.listGames(listGamesRequest);
         } catch (ResponseException e) {
             assert e.getMessage().equals("Error: unauthorized");
         }

@@ -84,6 +84,7 @@ public class Server {
     }
 
     private Object createGame(Request req, Response res){
+        System.out.println("This should not happen");
         CreateGameRequest createGameRequest = new Gson().fromJson(req.body(), CreateGameRequest.class);
         createGameRequest = createGameRequest.addAuthToken(req.headers("authorization"));
         CreateGameResult createGameResult = gameService.createGame(createGameRequest);

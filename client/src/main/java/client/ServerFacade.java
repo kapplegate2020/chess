@@ -1,9 +1,11 @@
 package client;
 
 import com.google.gson.Gson;
+import request.ListGamesRequest;
 import request.LoginRequest;
 import request.LogoutRequest;
 import request.RegisterRequest;
+import result.ListGamesResult;
 import result.LoginResult;
 import result.LogoutResult;
 import result.RegisterResult;
@@ -13,6 +15,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.util.Objects;
 
 public class ServerFacade {
     String url;
@@ -33,19 +36,26 @@ public class ServerFacade {
         return makeRequest("DELETE", "/session", logoutRequest, LogoutResult.class, authToken);
     }
 
+    public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws ResponseException{
+        String authToken = listGamesRequest.authToken();
+        return makeRequest("GET", "/game", listGamesRequest, ListGamesResult.class, authToken);
+    }
+
     private  <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws ResponseException {
         try {
             URI uri = new URI(url + path);
             HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
             http.setRequestMethod(method);
-            http.setDoOutput(true);
             http.addRequestProperty("Content-Type", "application/json");
             if(authToken!= null){
                 http.addRequestProperty("authorization", authToken);
             }
-            String reqData = new Gson().toJson(request);
-            try (OutputStream reqBody = http.getOutputStream()){
-                reqBody.write(reqData.getBytes());
+            if(!Objects.equals(method, "GET")){
+                http.setDoOutput(true);
+                String reqData = new Gson().toJson(request);
+                try (OutputStream reqBody = http.getOutputStream()){
+                    reqBody.write(reqData.getBytes());
+                }
             }
             http.connect();
             int statusCode = http.getResponseCode();
@@ -68,7 +78,7 @@ public class ServerFacade {
         catch (ResponseException e){
             throw e;
         } catch (Exception e) {
-            throw new ResponseException("Unknown Error");
+            throw new ResponseException("Unknown Error.");
         }
     }
 
