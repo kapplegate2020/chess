@@ -49,4 +49,9 @@ public class Repl {
         promptMessage = "[IN GAME]";
         client = new GameClient(serverURL, this, authToken, game, viewPoint);
     }
+
+    public void leaveGame(String authToken){
+        promptMessage = "[LOGGED IN]";
+        client = new LoggedInClient(serverURL, this, authToken);
+    }
 }

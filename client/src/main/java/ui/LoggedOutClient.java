@@ -41,19 +41,17 @@ public class LoggedOutClient implements Client{
                 - register <USERNAME> <PASSWORD> <EMAIL> - to create an account
                 - login <USERNAME> <PASSWORD> - to play chess
                 - quit - to close the application
+                - help
                 """;
     }
 
     private String register(String[] params) throws ResponseException {
-        if(params.length<=1 || params.length>=4){
+        if(params.length!= 3){
             return "Invalid Command.";
         }
         String username = params[0];
         String password = params[1];
-        String email = null;
-        if(params.length == 3){
-            email = params[2];
-        }
+        String email = params[2];
         RegisterRequest registerRequest = new RegisterRequest(username, password, email);
         RegisterResult registerResult = serverFacade.register(registerRequest);
         repl.login(registerResult.authToken());

@@ -24,6 +24,10 @@ public class GameClient implements Client{
             repl.quit();
             return "";
         }
+        else if(input.equals("leave")){
+            repl.leaveGame(authToken);
+            return "";
+        }
         return "Not yet implemented.";
     }
 

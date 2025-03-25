@@ -53,6 +53,7 @@ public class LoggedInClient implements Client{
                 - list - to list all the games
                 - join <ID> [WHITE|BLACK] - to join a game
                 - observe <ID> - to watch a game
+                - help
                 """;
     }
 
