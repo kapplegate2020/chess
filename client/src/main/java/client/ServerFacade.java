@@ -1,14 +1,8 @@
 package client;
 
 import com.google.gson.Gson;
-import request.ListGamesRequest;
-import request.LoginRequest;
-import request.LogoutRequest;
-import request.RegisterRequest;
-import result.ListGamesResult;
-import result.LoginResult;
-import result.LogoutResult;
-import result.RegisterResult;
+import request.*;
+import result.*;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -39,6 +33,16 @@ public class ServerFacade {
     public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws ResponseException{
         String authToken = listGamesRequest.authToken();
         return makeRequest("GET", "/game", listGamesRequest, ListGamesResult.class, authToken);
+    }
+
+    public CreateGameResult createGame(CreateGameRequest createGameRequest) throws ResponseException{
+        String authToken = createGameRequest.authToken();
+        return makeRequest("POST", "/game", createGameRequest, CreateGameResult.class, authToken);
+    }
+
+    public JoinGameResult joinGame(JoinGameRequest joinGameRequest) throws ResponseException{
+        String authToken = joinGameRequest.authToken();
+        return makeRequest("PUT", "/game", joinGameRequest, JoinGameResult.class, authToken);
     }
 
     private  <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws ResponseException {

@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.DbAuthDataAccess;
 import dataaccess.DbGameDataAccess;
@@ -8,14 +9,8 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
-import request.ListGamesRequest;
-import request.LoginRequest;
-import request.LogoutRequest;
-import request.RegisterRequest;
-import result.ListGamesResult;
-import result.LoginResult;
-import result.LogoutResult;
-import result.RegisterResult;
+import request.*;
+import result.*;
 import server.Server;
 import service.UserService;
 
@@ -186,6 +181,86 @@ public class ServerFacadeTests {
             ListGamesResult listGamesResult = serverFacade.listGames(listGamesRequest);
         } catch (ResponseException e) {
             assert e.getMessage().equals("Error: unauthorized");
+        }
+    }
+
+    @Test
+    public void createGameSuccess(){
+        String authToken = "exampleAuthToken1234";
+        try{
+            AuthData authData = new AuthData(authToken, "Sammy");
+            authDataAccess.createAuth(authData);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        CreateGameRequest createGameRequest = new CreateGameRequest(authToken, "Stevie's Game");
+        try {
+            CreateGameResult createGameResult = serverFacade.createGame(createGameRequest);
+            assert createGameResult.gameID() != null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void createGameFailure(){
+        String authToken = "exampleAuthToken1234";
+        CreateGameRequest createGameRequest = new CreateGameRequest(authToken, "myGame");
+        try {
+            CreateGameResult createGameResult = serverFacade.createGame(createGameRequest);
+        } catch (ResponseException e) {
+            assert e.getMessage().equals("Error: unauthorized");
+        }
+    }
+
+    @Test
+    public void joinGameSuccess(){
+        String authToken = "exampleAuthToken1234";
+        try{
+            AuthData authData = new AuthData(authToken, "Sammy");
+            authDataAccess.createAuth(authData);
+            GameData gameData = new GameData(0, null, "Jerry", "theGame", null);
+            gameDataAccess.createGame(gameData);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, 0, ChessGame.TeamColor.WHITE);
+        try {
+            JoinGameResult joinGameResult = serverFacade.joinGame(joinGameRequest);
+        } catch (ResponseException e) {
+            throw new RuntimeException(e);
+        }
+
+        try{
+            GameData gameData = gameDataAccess.getGame(0);
+            assert gameData != null;
+            assert gameData.gameName().equals("theGame");
+            assert gameData.whiteUsername().equals("Sammy");
+            assert gameData.blackUsername().equals("Jerry");
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void joinGameFailure(){
+        String authToken = "exampleAuthToken1234";
+        try{
+            AuthData authData = new AuthData(authToken, "Sammy");
+            authDataAccess.createAuth(authData);
+            GameData gameData = new GameData(543, "Sarah", null, "theCoolGame", null);
+            gameDataAccess.createGame(gameData);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, 543, ChessGame.TeamColor.WHITE);
+        try {
+            JoinGameResult joinGameResult = serverFacade.joinGame(joinGameRequest);
+        } catch (ResponseException e) {
+            assert e.getMessage().equals("Error: already taken");
         }
     }
 
