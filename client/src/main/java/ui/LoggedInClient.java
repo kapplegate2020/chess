@@ -1,9 +1,11 @@
 package ui;
 
+import chess.ChessGame;
 import client.ResponseException;
 import client.ServerFacade;
 import model.GameData;
 import request.CreateGameRequest;
+import request.JoinGameRequest;
 import request.ListGamesRequest;
 import request.LogoutRequest;
 import result.CreateGameResult;
@@ -17,7 +19,7 @@ public class LoggedInClient implements Client{
     ServerFacade serverFacade;
     Repl repl;
     String authToken;
-    ArrayList<Integer> gameIds = new ArrayList<>();
+    ArrayList<Integer> gameIds = null;
 
     public LoggedInClient(String serverURL, Repl repl, String authToken){
         serverFacade = new ServerFacade(serverURL);
@@ -79,7 +81,7 @@ public class LoggedInClient implements Client{
         }
         ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
         ListGamesResult listGamesResult = serverFacade.listGames(listGamesRequest);
-        gameIds.clear();
+        gameIds = new ArrayList<>();
         Integer counter = 0;
         StringBuilder gameStr = new StringBuilder();
         for(GameData game : listGamesResult.games()){
@@ -103,6 +105,46 @@ public class LoggedInClient implements Client{
             counter++;
         }
         return gameStr.toString();
+    }
+
+    private String joinGame(String[] params) throws ResponseException{
+        if(params.length!=2){
+            return "Invalid Command.";
+        }
+
+        int id;
+        try{
+            id = Integer.parseInt(params[0]);
+        } catch (NumberFormatException e) {
+            return "Not an integer";
+        }
+
+        if(gameIds == null){
+            return "Please list the games before trying to join.";
+        }
+
+        if(gameIds.isEmpty()){
+            return "There are no games currently. You can create a game.";
+        }
+
+        if(id<0 || id>=gameIds.size()){
+            return "Please enter a valid gameID";
+        }
+
+        ChessGame.TeamColor team = null;
+        if(params[1].equals("white")){
+            team = ChessGame.TeamColor.WHITE;
+        }
+        else if(params[1].equals("black")){
+            team = ChessGame.TeamColor.BLACK;
+        }
+        else{
+            return "Please choose either black or white.";
+        }
+
+        JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, gameIds.get(id), team);
+        serverFacade.joinGame(joinGameRequest);
+        return "Successfully joined game "+id;
     }
 
 
