@@ -1,6 +1,9 @@
 package client;
 
 import dataaccess.DataAccessException;
+import dataaccess.DbAuthDataAccess;
+import dataaccess.DbGameDataAccess;
+import dataaccess.DbUserDataAccess;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
@@ -13,6 +16,9 @@ public class ServerFacadeTests {
 
     private static Server server;
     private static ServerFacade serverFacade;
+    private static final DbUserDataAccess userDataAccess = new DbUserDataAccess();
+    private static final DbGameDataAccess gameDataAccess = new DbGameDataAccess();
+    private static final DbAuthDataAccess authDataAccess = new DbAuthDataAccess();
 
     @BeforeAll
     public static void init() {
@@ -27,6 +33,17 @@ public class ServerFacadeTests {
         server.stop();
     }
 
+
+    @BeforeEach
+    void resetDb(){
+        try {
+            userDataAccess.clear();
+            gameDataAccess.clear();
+            authDataAccess.clear();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Test
     public void registerSuccess() {
