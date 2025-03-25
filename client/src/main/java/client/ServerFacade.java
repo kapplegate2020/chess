@@ -1,7 +1,9 @@
 package client;
 
 import com.google.gson.Gson;
+import request.LoginRequest;
 import request.RegisterRequest;
+import result.LoginResult;
 import result.RegisterResult;
 
 import java.io.InputStream;
@@ -17,24 +19,11 @@ public class ServerFacade {
     }
 
     public RegisterResult register(RegisterRequest registerRequest) throws ResponseException{
-        RegisterResult result = new RegisterResult(null, null, null, null);
         return makeRequest("POST", "/user", registerRequest, RegisterResult.class);
-//        HttpURLConnection http = (HttpURLConnection) new URI(url+"/user").toURL().openConnection();
-//        http.setRequestMethod("POST");
-//        http.setDoOutput(true);
-//        http.addRequestProperty("Content-Type", "application/json");
-//        String reqData = new Gson().toJson(registerRequest);
-//        try (OutputStream reqBody = http.getOutputStream()){
-//            reqBody.write(reqData.getBytes());
-//        }
-//        http.connect();
-//        int statusCode = http.getResponseCode();
-//        RegisterResult registerResult;
-//        try (InputStream respBody = http.getInputStream()) {
-//            InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-//            registerResult = new Gson().fromJson(inputStreamReader, RegisterResult.class);
-//        }
-//        return registerResult;
+    }
+
+    public LoginResult login(LoginRequest loginRequest) throws ResponseException{
+        return makeRequest("POST", "/session", loginRequest, LoginResult.class);
     }
 
     private  <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {

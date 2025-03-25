@@ -7,7 +7,9 @@ import dataaccess.DbUserDataAccess;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
+import request.LoginRequest;
 import request.RegisterRequest;
+import result.LoginResult;
 import result.RegisterResult;
 import server.Server;
 
@@ -70,6 +72,42 @@ public class ServerFacadeTests {
             RegisterResult registerResult = serverFacade.register(registerRequest);
         } catch (ResponseException e) {
             assert e.getMessage().equals("Error: already taken");
+        }
+    }
+
+    @Test
+    public void loginSuccess(){
+        try{
+            //password is encrypted version of test1234
+            UserData userData = new UserData("Johnny", "$2a$10$wecv.H9ZkuxxPd0iieNz/ufX4Dq8tx73LvpVlSlRF.B.YD4IfUMV6", "fake@email.com");
+            userDataAccess.createUser(userData);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        LoginRequest loginRequest = new LoginRequest("Johnny", "test1234");
+        try {
+            LoginResult loginResult = serverFacade.login(loginRequest);
+            assert loginResult.username().equals("Johnny");
+            assert loginResult.authToken() != null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void loginFailure(){
+        try{
+            //password is encrypted version of test1234
+            UserData userData = new UserData("Johnny", "$2a$10$wecv.H9ZkuxxPd0iieNz/ufX4Dq8tx73LvpVlSlRF.B.YD4IfUMV6", "fake@email.com");
+            userDataAccess.createUser(userData);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        LoginRequest loginRequest = new LoginRequest("Johnny", "wrongPassword");
+        try {
+            LoginResult loginResult = serverFacade.login(loginRequest);
+        } catch (ResponseException e) {
+            assert e.getMessage().equals("Error: unauthorized");
         }
     }
 
