@@ -27,18 +27,11 @@ public class LoggedOutClient implements Client{
         }
         String command = tokens[0];
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-        if(command.equals("register")){
-            return register(params);
-        }
-        else if(command.equals("login")){
-            return login(params);
-        }
-        else if (command.equals("quit")) {
-            repl.quit();
-            return "";
-        }
-        else{
-            return help();
+        switch (command) {
+            case "register" -> register(params);
+            case "login" -> login(params);
+            case "quit" -> quit(params);
+            default -> help();
         }
     }
 
@@ -51,9 +44,9 @@ public class LoggedOutClient implements Client{
                 """;
     }
 
-    public String register(String[] params) throws ResponseException {
+    private String register(String[] params) throws ResponseException {
         if(params.length<=1 || params.length>=4){
-            return "Invalid Syntax.";
+            return "Invalid Command.";
         }
         String username = params[0];
         String password = params[1];
@@ -67,9 +60,9 @@ public class LoggedOutClient implements Client{
         return "Successfully registered as "+username;
     }
 
-    public String login(String[] params) throws ResponseException {
+    private String login(String[] params) throws ResponseException {
         if(params.length != 2){
-            return "Invalid Syntax.";
+            return "Invalid Command.";
         }
         String username = params[0];
         String password = params[1];
@@ -77,6 +70,14 @@ public class LoggedOutClient implements Client{
         LoginResult loginResult = serverFacade.login(loginRequest);
         repl.login(loginResult.authToken());
         return "Successfully registered as "+username;
+    }
+
+    private String quit(String[] params){
+        if(params.length>0){
+            return "Invalid Command.";
+        }
+        repl.quit();
+        return "";
     }
 
 }
