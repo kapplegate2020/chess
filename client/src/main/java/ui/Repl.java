@@ -1,5 +1,7 @@
 package ui;
 
+import chess.ChessGame;
+
 import java.util.Scanner;
 
 public class Repl {
@@ -41,5 +43,10 @@ public class Repl {
 
     public void quit(){
         quit = true;
+    }
+
+    public void joinGame(String authToken, ChessGame game, ChessGame.TeamColor viewPoint){
+        promptMessage = "[IN GAME]";
+        client = new GameClient(serverURL, this, authToken, game, viewPoint);
     }
 }

@@ -63,7 +63,7 @@ public class LoggedInClient implements Client{
         LogoutRequest logoutRequest = new LogoutRequest(authToken);
         serverFacade.logout(logoutRequest);
         repl.logout();
-        return "";
+        return "Successfully logged out.";
     }
 
     private String createGame(String[] params) throws  ResponseException{
@@ -144,6 +144,7 @@ public class LoggedInClient implements Client{
 
         JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, gameIds.get(id), team);
         serverFacade.joinGame(joinGameRequest);
+        repl.joinGame(authToken, new ChessGame(), team);
         return "Successfully joined game "+id;
     }
 
@@ -171,8 +172,8 @@ public class LoggedInClient implements Client{
         if(id<0 || id>=gameIds.size()){
             return "Please enter a valid gameID";
         }
-
-        return "This feature is not implemented yet.";
+        repl.joinGame(authToken, new ChessGame(), ChessGame.TeamColor.WHITE);
+        return "This feature is not fully implemented yet.";
     }
 
 

@@ -27,12 +27,12 @@ public class LoggedOutClient implements Client{
         }
         String command = tokens[0];
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-        switch (command) {
+        return switch (command) {
             case "register" -> register(params);
             case "login" -> login(params);
             case "quit" -> quit(params);
             default -> help();
-        }
+        };
     }
 
     @Override
@@ -69,7 +69,7 @@ public class LoggedOutClient implements Client{
         LoginRequest loginRequest = new LoginRequest(username, password);
         LoginResult loginResult = serverFacade.login(loginRequest);
         repl.login(loginResult.authToken());
-        return "Successfully registered as "+username;
+        return "Successfully logged in as "+username;
     }
 
     private String quit(String[] params){
