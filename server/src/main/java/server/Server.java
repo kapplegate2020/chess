@@ -16,6 +16,7 @@ public class Server {
     private final UserService userService = new UserService(userDataAccess, authDataAccess);
     private final GameService gameService = new GameService(gameDataAccess, authDataAccess);
     private final ClearService clearService = new ClearService(userDataAccess, gameDataAccess, authDataAccess);
+    private final WSServer wsServer = new WSServer();
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -23,6 +24,8 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
+        Spark.webSocket("/ws", wsServer);
+
         Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
