@@ -149,7 +149,7 @@ public class GameClient implements Client{
                 - leave - leaves the game and returns to logged in menu
                 - move <start Letter><start Number> <end Letter><end Number> - moves piece from start to end
                 - resign - resigns game and leaves
-                - legal - highlights all legal moves
+                - legal <start Letter><start Number> - highlights all legal moves
                 - help
                 """;
     }
