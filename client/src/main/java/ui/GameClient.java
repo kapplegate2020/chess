@@ -62,6 +62,7 @@ public class GameClient implements Client{
         if(params.length!=0){
             return "Invalid Command.";
         }
+        System.out.println(game.getBoard());
         DrawGame drawGame = new DrawGame(game, viewPoint);
         drawGame.draw(null);
         return "";

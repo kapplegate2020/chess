@@ -41,10 +41,14 @@ public class DrawGame {
     }
 
     public void draw(ChessPosition position){
-        Collection<ChessMove> moves = game.validMoves(position);
         ArrayList<ChessPosition> movePositions = new ArrayList<>();
-        for(ChessMove move:moves){
-            movePositions.add(move.getEndPosition());
+        if(position != null) {
+            Collection<ChessMove> moves = game.validMoves(position);
+            if(moves!= null) {
+                for (ChessMove move : moves) {
+                    movePositions.add(move.getEndPosition());
+                }
+            }
         }
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
