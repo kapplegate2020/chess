@@ -57,8 +57,8 @@ public class WSServer {
         switch (userGameCommand.getCommandType()) {
             case UserGameCommand.CommandType.CONNECT -> connect(userGameCommand, session, gameData, userData.username());
             case UserGameCommand.CommandType.MAKE_MOVE -> makeMove(userGameCommand, session, gameData, userData.username());
-            case UserGameCommand.CommandType.LEAVE -> leave(userGameCommand, session);
-            case UserGameCommand.CommandType.RESIGN -> resign(userGameCommand, session);
+            case UserGameCommand.CommandType.LEAVE -> leave(userGameCommand, session, gameData, userData.username());
+            case UserGameCommand.CommandType.RESIGN -> resign(userGameCommand, session, gameData, userData.username());
         }
         ;
     }
@@ -124,12 +124,40 @@ public class WSServer {
         roomHandler.broadcast(userGameCommand.getGameID(), session, moveMessage);
     }
 
-    private void leave(UserGameCommand userGameCommand, Session session){
+    private void leave(UserGameCommand userGameCommand, Session session, GameData gameData, String username) throws Exception{
+        roomHandler.remove(gameData.gameID(), session);
+        if(username.equals(gameData.whiteUsername())){
+            gameData = gameData.addWhiteUsername(null);
+            gameDataAccess.updateGame(gameData);
+        }
+        else if(username.equals(gameData.blackUsername())){
+            gameData = gameData.addBlackUsername(null);
+            gameDataAccess.updateGame(gameData);
+        }
+        NotificationMessage leaveMessage = new NotificationMessage(username+" has left the game.");
+        roomHandler.broadcast(userGameCommand.getGameID(), session, leaveMessage);
 
     }
 
-    private void resign(UserGameCommand userGameCommand, Session session){
-
+    private void resign(UserGameCommand userGameCommand, Session session, GameData gameData, String username) throws Exception{
+        ChessGame game = gameData.game();
+        if(username.equals(gameData.whiteUsername())){
+            game.setTeamTurn(null);
+            gameData = gameData.updateGame(game);
+            gameDataAccess.updateGame(gameData);
+        }
+        else if(username.equals(gameData.blackUsername())){
+            game.setTeamTurn(null);
+            gameData = gameData.updateGame(game);
+            gameDataAccess.updateGame(gameData);
+        }
+        else{
+            ErrorMessage errorMessage = new ErrorMessage("Error: Observers cannot resign.");
+            session.getRemote().sendString(new Gson().toJson(errorMessage));
+            return;
+        }
+        NotificationMessage resignMessage = new NotificationMessage(username+" has resigned.");
+        roomHandler.broadcast(userGameCommand.getGameID(), null, resignMessage);
     }
 
     private String generateMoveMessage(String username, ChessMove move){

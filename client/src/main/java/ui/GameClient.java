@@ -61,7 +61,13 @@ public class GameClient implements Client{
     }
 
     private String leave(String[] params){
-        return "Not implemented yet";
+        try {
+            webSocketFacade.leave(authToken, gameID);
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+        repl.leaveGame(authToken);
+        return "Successfully left game.";
     }
 
     private String move(String[] params){
