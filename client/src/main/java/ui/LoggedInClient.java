@@ -128,7 +128,7 @@ public class LoggedInClient implements Client{
 
         JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, gameIds.get(id), team);
         serverFacade.joinGame(joinGameRequest);
-        repl.joinGame(authToken, new ChessGame(), team);
+        repl.joinGame(authToken, id, team);
         return "Successfully joined game "+id;
     }
 
@@ -140,7 +140,7 @@ public class LoggedInClient implements Client{
 
         int id = checkGameId(params[0]);
 
-        repl.joinGame(authToken, new ChessGame(), ChessGame.TeamColor.WHITE);
+        repl.joinGame(authToken, id, ChessGame.TeamColor.WHITE);
         return "This feature is not fully implemented yet.";
     }
 

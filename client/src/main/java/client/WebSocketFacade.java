@@ -1,5 +1,8 @@
 package client;
 
+import com.google.gson.Gson;
+import websocket.commands.UserGameCommand;
+
 import javax.websocket.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -24,8 +27,9 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void send(String message) throws Exception{
-        this.session.getBasicRemote().sendText(message);
+    public void connect(String authToken, int gameID) throws Exception{
+        UserGameCommand userGameCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+        this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
     }
 
     @Override

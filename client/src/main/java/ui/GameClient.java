@@ -8,15 +8,21 @@ import java.util.Arrays;
 
 public class GameClient implements Client{
     ChessGame game;
+    int gameID;
     String authToken;
     Repl repl;
     WebSocketFacade webSocketFacade;
 
-    public GameClient(String serverURL, Repl repl, String authToken, ChessGame game, ChessGame.TeamColor viewPoint){
+    public GameClient(String serverURL, Repl repl, String authToken, int gameID, ChessGame.TeamColor viewPoint){
         this.repl = repl;
         this.authToken = authToken;
-        this.game = game;
         webSocketFacade = new WebSocketFacade(serverURL);
+        this.gameID = gameID;
+        try{
+            webSocketFacade.connect(authToken, gameID);
+        } catch (Exception e) {
+
+        }
         DrawGame draw = new DrawGame(game, viewPoint);
         draw.draw();
     }
@@ -41,7 +47,7 @@ public class GameClient implements Client{
 
     private String redraw(String[] params){
         try {
-            webSocketFacade.send("Testing, 123");
+            //webSocketFacade.send("Testing, 123");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

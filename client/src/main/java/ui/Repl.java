@@ -45,9 +45,9 @@ public class Repl {
         quit = true;
     }
 
-    public void joinGame(String authToken, ChessGame game, ChessGame.TeamColor viewPoint){
+    public void joinGame(String authToken, int gameID, ChessGame.TeamColor viewPoint){
         promptMessage = "[IN GAME]";
-        client = new GameClient(serverURL, this, authToken, game, viewPoint);
+        client = new GameClient(serverURL, this, authToken, gameID, viewPoint);
     }
 
     public void leaveGame(String authToken){
