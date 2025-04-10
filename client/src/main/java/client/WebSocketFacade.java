@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 
 public class WebSocketFacade extends Endpoint {
     Session session;
+    NotificationHandler notificationHandler = new NotificationHandler();
 
     public WebSocketFacade(String url){
         try {
@@ -19,7 +20,7 @@ public class WebSocketFacade extends Endpoint {
 
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 public void onMessage(String message) {
-                    System.out.println(message);
+                    notificationHandler.notify(message);
                 }
             });
         } catch (Exception e) {
