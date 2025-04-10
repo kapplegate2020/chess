@@ -29,12 +29,16 @@ public class NotificationHandler {
 
     private void notification(String message){
         NotificationMessage notificationMessage = new Gson().fromJson(message, NotificationMessage.class);
+        System.out.println();
         System.out.println(notificationMessage.message());
+        System.out.print("[IN GAME] >>> ");
     }
 
     private void error(String message){
         ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
+        System.out.println();
         System.out.println(errorMessage.errorMessage());
+        System.out.print("[IN GAME] >>> ");
     }
 
     private void load(String message){
@@ -43,5 +47,6 @@ public class NotificationHandler {
         DrawGame drawGame = new DrawGame(loadGameMessage.game(), viewpoint);
         drawGame.draw();
         gameClient.updateChessGame(loadGameMessage.game());
+        System.out.print("[IN GAME] >>> ");
     }
 }

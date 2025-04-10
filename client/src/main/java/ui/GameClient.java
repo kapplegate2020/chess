@@ -18,6 +18,7 @@ public class GameClient implements Client{
     WebSocketFacade webSocketFacade;
     NotificationHandler notificationHandler;
     ChessGame.TeamColor viewPoint;
+    boolean checkResign = false;
 
     public GameClient(String serverURL, Repl repl, String authToken, int gameID, ChessGame.TeamColor viewPoint){
         this.repl = repl;
@@ -41,14 +42,19 @@ public class GameClient implements Client{
         }
         String command = tokens[0];
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-        return switch (command) {
+        String toReturn = switch (command) {
             case "redraw" -> redraw(params);
             case "leave" -> leave(params);
             case "move" -> move(params);
-            case "resign" -> resign(params);
+            case "resign" -> checkResign(params);
+            case "yes" -> resign(params);
             case "legal" -> legal(params);
             default -> help();
         };
+        if(!command.equals("resign")){
+            checkResign = false;
+        }
+        return toReturn;
     }
 
     private String redraw(String[] params){
@@ -61,6 +67,9 @@ public class GameClient implements Client{
     }
 
     private String leave(String[] params){
+        if(params.length!=0){
+            return "Invalid Command.";
+        }
         try {
             webSocketFacade.leave(authToken, gameID);
         } catch (Exception e) {
@@ -98,8 +107,27 @@ public class GameClient implements Client{
         return "";
     }
 
+    private String checkResign(String[] params){
+        if(params.length!=0){
+            return "Invalid Command.";
+        }
+        checkResign = true;
+        return "Are you sure you want to resign? [yes|no]";
+    }
+
     private String resign(String[] params){
-        return "Not implemented yet";
+        if(params.length!=0){
+            return "Invalid Command.";
+        }
+        if(checkResign){
+            try {
+                webSocketFacade.resign(authToken, gameID);
+                return "";
+            } catch (Exception e) {
+                return e.getMessage();
+            }
+        }
+        return help();
     }
 
     private String legal(String[] params){
