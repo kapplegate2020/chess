@@ -12,6 +12,7 @@ import java.util.Collection;
 public class ChessGame {
     TeamColor currentTurn = TeamColor.WHITE;
     ChessBoard board = new ChessBoard();
+    boolean resigned = false;
 
     public ChessGame() {
         board.resetBoard();
@@ -76,6 +77,10 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if(resigned){
+            throw new InvalidMoveException("Game is already over");
+        }
+
         //get vars and check the turn
         ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
@@ -247,5 +252,13 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    public void resign(){
+        resigned = true;
+    }
+
+    public boolean isResigned(){
+        return resigned;
     }
 }

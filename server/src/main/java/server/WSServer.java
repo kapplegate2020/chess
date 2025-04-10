@@ -141,13 +141,18 @@ public class WSServer {
 
     private void resign(UserGameCommand userGameCommand, Session session, GameData gameData, String username) throws Exception{
         ChessGame game = gameData.game();
+        if(game.isResigned()){
+            ErrorMessage errorMessage = new ErrorMessage("Error: Game is already over.");
+            session.getRemote().sendString(new Gson().toJson(errorMessage));
+            return;
+        }
         if(username.equals(gameData.whiteUsername())){
-            game.setTeamTurn(null);
+            game.resign();
             gameData = gameData.updateGame(game);
             gameDataAccess.updateGame(gameData);
         }
         else if(username.equals(gameData.blackUsername())){
-            game.setTeamTurn(null);
+            game.resign();
             gameData = gameData.updateGame(game);
             gameDataAccess.updateGame(gameData);
         }
