@@ -1,6 +1,9 @@
 package server;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.*;
 import model.AuthData;
@@ -10,6 +13,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
@@ -33,37 +37,90 @@ public class WSServer {
         UserGameCommand userGameCommand = new Gson().fromJson(message, UserGameCommand.class);
         AuthData authData = authDataAccess.getAuth(userGameCommand.getAuthToken());
         if (authData == null) {
+            ErrorMessage errorMessage = new ErrorMessage("Error: not authenticated.");
+            session.getRemote().sendString(new Gson().toJson(errorMessage));
             return;
         }
         UserData userData = userDataAccess.getUser(authData.username());
         if (userData == null) {
+            ErrorMessage errorMessage = new ErrorMessage("Error: invalid username.");
+            session.getRemote().sendString(new Gson().toJson(errorMessage));
             return;
         }
         GameData gameData = gameDataAccess.getGame(userGameCommand.getGameID());
-        System.out.println(userGameCommand.getGameID());
         if (gameData == null) {
+            ErrorMessage errorMessage = new ErrorMessage("Error: invalid gameID.");
+            session.getRemote().sendString(new Gson().toJson(errorMessage));
             return;
         }
 
         switch (userGameCommand.getCommandType()) {
-            case UserGameCommand.CommandType.CONNECT -> connect(userGameCommand, session, gameData.game(), userData.username());
-            case UserGameCommand.CommandType.MAKE_MOVE -> makeMove(userGameCommand, session);
+            case UserGameCommand.CommandType.CONNECT -> connect(userGameCommand, session, gameData, userData.username());
+            case UserGameCommand.CommandType.MAKE_MOVE -> makeMove(userGameCommand, session, gameData, userData.username());
             case UserGameCommand.CommandType.LEAVE -> leave(userGameCommand, session);
             case UserGameCommand.CommandType.RESIGN -> resign(userGameCommand, session);
         }
         ;
     }
 
-    private void connect(UserGameCommand userGameCommand, Session session, ChessGame game, String username) throws Exception{
+    private void connect(UserGameCommand userGameCommand, Session session, GameData gameData, String username) throws Exception{
         roomHandler.add(userGameCommand.getGameID(), session);
-        NotificationMessage joinMessage = new NotificationMessage(username + " has joined the game.");
-        roomHandler.broadcast(userGameCommand.getGameID(), session, joinMessage);
-        LoadGameMessage loadGameMessage = new LoadGameMessage(game);
+        LoadGameMessage loadGameMessage = new LoadGameMessage(gameData.game());
         session.getRemote().sendString(new Gson().toJson(loadGameMessage));
+
+        NotificationMessage joinMessage;
+        if(username.equals(gameData.whiteUsername())){
+            joinMessage = new NotificationMessage(username + " has joined the game as white.");
+        }
+        else if(username.equals(gameData.blackUsername())){
+            joinMessage = new NotificationMessage(username + " has joined the game as black.");
+        }
+        else{
+            joinMessage = new NotificationMessage(username + " has joined the game as an observer.");
+        }
+        roomHandler.broadcast(userGameCommand.getGameID(), session, joinMessage);
     }
 
-    private void makeMove(UserGameCommand userGameCommand, Session session){
-
+    private void makeMove(UserGameCommand userGameCommand, Session session, GameData gameData, String username) throws Exception{
+        ChessGame game = gameData.game();
+        if(username.equals(gameData.whiteUsername())){
+            if(game.getTeamTurn()!= ChessGame.TeamColor.WHITE){
+                ErrorMessage errorMessage = new ErrorMessage("Error: it is not your turn.");
+                session.getRemote().sendString(new Gson().toJson(errorMessage));
+                return;
+            }
+            try{
+                game.makeMove(userGameCommand.getMove());
+            } catch (InvalidMoveException e) {
+                ErrorMessage errorMessage = new ErrorMessage("Error: "+e.getMessage());
+                session.getRemote().sendString(new Gson().toJson(errorMessage));
+                return;
+            }
+        }
+        else if(username.equals(gameData.blackUsername())){
+            if(game.getTeamTurn()!= ChessGame.TeamColor.BLACK){
+                ErrorMessage errorMessage = new ErrorMessage("Error: it is not your turn.");
+                session.getRemote().sendString(new Gson().toJson(errorMessage));
+                return;
+            }
+            try{
+                game.makeMove(userGameCommand.getMove());
+            } catch (InvalidMoveException e) {
+                ErrorMessage errorMessage = new ErrorMessage("Error: "+e.getMessage());
+                session.getRemote().sendString(new Gson().toJson(errorMessage));
+                return;
+            }
+        }
+        else{
+            ErrorMessage errorMessage = new ErrorMessage("Error: Observers cannot make moves.");
+            session.getRemote().sendString(new Gson().toJson(errorMessage));
+        }
+        gameData = gameData.updateGame(game);
+        gameDataAccess.updateGame(gameData);
+        LoadGameMessage loadGameMessage = new LoadGameMessage(game);
+        roomHandler.broadcast(userGameCommand.getGameID(), session, loadGameMessage);
+        NotificationMessage moveMessage = new NotificationMessage(generateMoveMessage(username, userGameCommand.getMove()));
+        roomHandler.broadcast(userGameCommand.getGameID(), session, moveMessage);
     }
 
     private void leave(UserGameCommand userGameCommand, Session session){
@@ -71,6 +128,17 @@ public class WSServer {
     }
 
     private void resign(UserGameCommand userGameCommand, Session session){
+
+    }
+
+    private String generateMoveMessage(String username, ChessMove move){
+        String[] letters = {"A", "B", "C", "D", "E", "F", "G", "H"};
+        String moveStr = username + " moved a piece from ";
+        moveStr += letters[move.getStartPosition().getRow()-1]+move.getStartPosition().getColumn();
+        moveStr += " to ";
+        moveStr += letters[move.getEndPosition().getRow()-1]+move.getEndPosition().getColumn();
+        return moveStr+".";
+
 
     }
 
