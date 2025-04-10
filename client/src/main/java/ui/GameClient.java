@@ -2,6 +2,7 @@ package ui;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import client.NotificationHandler;
 import client.ServerFacade;
@@ -62,7 +63,7 @@ public class GameClient implements Client{
             return "Invalid Command.";
         }
         DrawGame drawGame = new DrawGame(game, viewPoint);
-        drawGame.draw();
+        drawGame.draw(null);
         return "";
     }
 
@@ -80,22 +81,19 @@ public class GameClient implements Client{
     }
 
     private String move(String[] params){
-        String letters = "abcdefgh";
         if(params.length!=2){
             return "Invalid Command.";
         }
 
         ChessPosition[] positions = new ChessPosition[2];
         for(int i=0; i<2;i++){
-            if(params[0].length()!=2){
+            ChessPosition position = getPosition(params[i]);
+            if(position !=null){
+                positions[i] = position;
+            }
+            else{
                 return "Location must consist of 1 letter between A and H and 1 number between 1 and 8";
             }
-            int x = letters.indexOf(params[i].charAt(0));
-            int y = Character.getNumericValue(params[i].charAt(1));
-            if(x == -1 || y<1 || y>8){
-                return "Location must consist of 1 letter between A and H and 1 number between 1 and 8";
-            }
-            positions[i] = new ChessPosition(y, x+1);
         }
 
         ChessMove move = new ChessMove(positions[0], positions[1], null);
@@ -131,7 +129,16 @@ public class GameClient implements Client{
     }
 
     private String legal(String[] params){
-        return "Not implemented yet";
+        if(params.length!=1){
+            return "Invalid Command.";
+        }
+        ChessPosition position = getPosition(params[0]);
+        if(position == null){
+            return "Location must consist of 1 letter between A and H and 1 number between 1 and 8";
+        }
+        DrawGame drawGame = new DrawGame(game, viewPoint);
+        drawGame.draw(position);
+        return "";
     }
 
     @Override
@@ -148,5 +155,18 @@ public class GameClient implements Client{
 
     public void updateChessGame(ChessGame game){
         this.game = game;
+    }
+
+    private ChessPosition getPosition(String positionStr){
+        String letters = "abcdefgh";
+        if(positionStr.length()!=2){
+            return null;
+        }
+        int x = letters.indexOf(positionStr.charAt(0));
+        int y = Character.getNumericValue(positionStr.charAt(1));
+        if(x == -1 || y<1 || y>8){
+            return null;
+        }
+        return new ChessPosition(y, x+1);
     }
 }

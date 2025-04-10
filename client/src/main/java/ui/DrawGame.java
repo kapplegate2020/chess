@@ -1,11 +1,14 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +20,7 @@ public class DrawGame {
     Integer[] numbers = {1, 2, 3, 4, 5, 6, 7, 8};
     Map<ChessPiece.PieceType, Character> pieces = new HashMap<>();
     String[] whiteBlackAlt= {SET_BG_COLOR_WHITE, SET_BG_COLOR_BLACK};
+    String[] greenAlt= {SET_BG_COLOR_GREEN, SET_BG_COLOR_DARK_GREEN};
     Map<ChessGame.TeamColor, String> textColors = new HashMap<>();
     ChessGame.TeamColor viewPoint;
 
@@ -36,12 +40,17 @@ public class DrawGame {
         }
     }
 
-    public void draw(){
+    public void draw(ChessPosition position){
+        Collection<ChessMove> moves = game.validMoves(position);
+        ArrayList<ChessPosition> movePositions = new ArrayList<>();
+        for(ChessMove move:moves){
+            movePositions.add(move.getEndPosition());
+        }
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
         drawHeader(out);
         for(int i : numbers){
-            drawRow(out, i);
+            drawRow(out, i, movePositions, position);
         }
         drawHeader(out);
     }
@@ -59,14 +68,24 @@ public class DrawGame {
         out.println();
     }
 
-    public void drawRow(PrintStream out, int i){
+    public void drawRow(PrintStream out, int i, Collection<ChessPosition> movePositions, ChessPosition start){
         out.print(SET_BG_COLOR_LIGHT_GREY);
         out.print(" ");
         out.print(8-i+1);
         out.print(" ");
         for(int j : numbers){
-            out.print(whiteBlackAlt[(i+j)%2]);
-            ChessPiece piece = game.getBoard().getPiece(new ChessPosition(8-i+1, j));
+            ChessPosition position = new ChessPosition(8-i+1, j);
+            if(position.equals(start)){
+                out.print(SET_BG_COLOR_YELLOW);
+            }
+            else if(movePositions.contains(position)){
+                out.print(greenAlt[(i+j)%2]);
+            }
+            else {
+                out.print(whiteBlackAlt[(i + j) % 2]);
+            }
+
+            ChessPiece piece = game.getBoard().getPiece(position);
             char pieceChar= ' ';
             if(piece!=null){
                 pieceChar = pieces.get(piece.getPieceType());

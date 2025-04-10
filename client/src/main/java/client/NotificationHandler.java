@@ -45,7 +45,7 @@ public class NotificationHandler {
         LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
         System.out.println();
         DrawGame drawGame = new DrawGame(loadGameMessage.game(), viewpoint);
-        drawGame.draw();
+        drawGame.draw(null);
         gameClient.updateChessGame(loadGameMessage.game());
         System.out.print("[IN GAME] >>> ");
     }
