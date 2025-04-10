@@ -1,5 +1,6 @@
 package server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.*;
 import model.AuthData;
@@ -9,6 +10,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.UserGameCommand;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.ServerMessage;
 
 
@@ -17,6 +19,7 @@ public class WSServer {
     UserDataAccess userDataAccess;
     GameDataAccess gameDataAccess;
     AuthDataAccess authDataAccess;
+    WebSocketRoomHandler roomHandler = new WebSocketRoomHandler();
 
     public WSServer(UserDataAccess userDataAccess, GameDataAccess gameDataAccess, AuthDataAccess authDataAccess){
         this.userDataAccess = userDataAccess;
@@ -44,27 +47,29 @@ public class WSServer {
         }
 
         switch (userGameCommand.getCommandType()) {
-            case UserGameCommand.CommandType.CONNECT -> connect(userGameCommand);
-            case UserGameCommand.CommandType.MAKE_MOVE -> makeMove(userGameCommand);
-            case UserGameCommand.CommandType.LEAVE -> leave(userGameCommand);
-            case UserGameCommand.CommandType.RESIGN -> resign(userGameCommand);
+            case UserGameCommand.CommandType.CONNECT -> connect(userGameCommand, session, gameData.game());
+            case UserGameCommand.CommandType.MAKE_MOVE -> makeMove(userGameCommand, session);
+            case UserGameCommand.CommandType.LEAVE -> leave(userGameCommand, session);
+            case UserGameCommand.CommandType.RESIGN -> resign(userGameCommand, session);
         }
         ;
     }
 
-    private void connect(UserGameCommand userGameCommand){
+    private void connect(UserGameCommand userGameCommand, Session session, ChessGame game){
+        roomHandler.add(userGameCommand.getGameID(), session);
+//        roomHandler.broadcast(userGameCommand.getGameID(), session, );
+        LoadGameMessage loadGameMessage = new LoadGameMessage(game);
+    }
+
+    private void makeMove(UserGameCommand userGameCommand, Session session){
 
     }
 
-    private void makeMove(UserGameCommand userGameCommand){
+    private void leave(UserGameCommand userGameCommand, Session session){
 
     }
 
-    private void leave(UserGameCommand userGameCommand){
-
-    }
-
-    private void resign(UserGameCommand userGameCommand){
+    private void resign(UserGameCommand userGameCommand, Session session){
 
     }
 
