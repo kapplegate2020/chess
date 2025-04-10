@@ -83,6 +83,10 @@ public class WSServer {
 
     private void makeMove(UserGameCommand userGameCommand, Session session, GameData gameData, String username) throws Exception{
         ChessGame game = gameData.game();
+        boolean checkMate = false;
+        boolean staleMate = false;
+        boolean check = false;
+        String opponent;
         if(username.equals(gameData.whiteUsername())){
             if(game.getTeamTurn()!= ChessGame.TeamColor.WHITE){
                 ErrorMessage errorMessage = new ErrorMessage("Error: it is not your turn.");
@@ -96,6 +100,10 @@ public class WSServer {
                 session.getRemote().sendString(new Gson().toJson(errorMessage));
                 return;
             }
+            checkMate = game.isInCheckmate(ChessGame.TeamColor.BLACK);
+            staleMate = game.isInStalemate(ChessGame.TeamColor.BLACK);
+            check = game.isInCheck(ChessGame.TeamColor.BLACK);
+            opponent = gameData.blackUsername();
         }
         else if(username.equals(gameData.blackUsername())){
             if(game.getTeamTurn()!= ChessGame.TeamColor.BLACK){
@@ -110,6 +118,10 @@ public class WSServer {
                 session.getRemote().sendString(new Gson().toJson(errorMessage));
                 return;
             }
+            checkMate = game.isInCheckmate(ChessGame.TeamColor.WHITE);
+            staleMate = game.isInStalemate(ChessGame.TeamColor.WHITE);
+            check = game.isInCheck(ChessGame.TeamColor.WHITE);
+            opponent = gameData.whiteUsername();
         }
         else{
             ErrorMessage errorMessage = new ErrorMessage("Error: Observers cannot make moves.");
@@ -122,6 +134,19 @@ public class WSServer {
         roomHandler.broadcast(userGameCommand.getGameID(), null, loadGameMessage);
         NotificationMessage moveMessage = new NotificationMessage(generateMoveMessage(username, userGameCommand.getMove()));
         roomHandler.broadcast(userGameCommand.getGameID(), session, moveMessage);
+
+        if(checkMate){
+            NotificationMessage message = new NotificationMessage(opponent+" is in checkmate.");
+            roomHandler.broadcast(userGameCommand.getGameID(), null, message);
+        }
+        else if(staleMate){
+            NotificationMessage message = new NotificationMessage(opponent+" is in stalemate.");
+            roomHandler.broadcast(userGameCommand.getGameID(), null, message);
+        }
+        else if(check){
+            NotificationMessage message = new NotificationMessage(opponent+" is in check.");
+            roomHandler.broadcast(userGameCommand.getGameID(), null, message);
+        }
     }
 
     private void leave(UserGameCommand userGameCommand, Session session, GameData gameData, String username) throws Exception{
