@@ -114,11 +114,12 @@ public class WSServer {
         else{
             ErrorMessage errorMessage = new ErrorMessage("Error: Observers cannot make moves.");
             session.getRemote().sendString(new Gson().toJson(errorMessage));
+            return;
         }
         gameData = gameData.updateGame(game);
         gameDataAccess.updateGame(gameData);
         LoadGameMessage loadGameMessage = new LoadGameMessage(game);
-        roomHandler.broadcast(userGameCommand.getGameID(), session, loadGameMessage);
+        roomHandler.broadcast(userGameCommand.getGameID(), null, loadGameMessage);
         NotificationMessage moveMessage = new NotificationMessage(generateMoveMessage(username, userGameCommand.getMove()));
         roomHandler.broadcast(userGameCommand.getGameID(), session, moveMessage);
     }
@@ -134,9 +135,9 @@ public class WSServer {
     private String generateMoveMessage(String username, ChessMove move){
         String[] letters = {"A", "B", "C", "D", "E", "F", "G", "H"};
         String moveStr = username + " moved a piece from ";
-        moveStr += letters[move.getStartPosition().getRow()-1]+move.getStartPosition().getColumn();
+        moveStr += letters[move.getStartPosition().getColumn()-1]+move.getStartPosition().getRow();
         moveStr += " to ";
-        moveStr += letters[move.getEndPosition().getRow()-1]+move.getEndPosition().getColumn();
+        moveStr += letters[move.getEndPosition().getColumn()-1]+move.getEndPosition().getRow();
         return moveStr+".";
 
 

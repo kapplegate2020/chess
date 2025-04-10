@@ -1,11 +1,14 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import client.NotificationHandler;
 import client.ServerFacade;
 import client.WebSocketFacade;
 
 import java.util.Arrays;
+import java.util.zip.CheckedInputStream;
 
 public class GameClient implements Client{
     ChessGame game;
@@ -14,10 +17,12 @@ public class GameClient implements Client{
     Repl repl;
     WebSocketFacade webSocketFacade;
     NotificationHandler notificationHandler;
+    ChessGame.TeamColor viewPoint;
 
     public GameClient(String serverURL, Repl repl, String authToken, int gameID, ChessGame.TeamColor viewPoint){
         this.repl = repl;
         this.authToken = authToken;
+        this.viewPoint = viewPoint;
         notificationHandler = new NotificationHandler(this, viewPoint);
         webSocketFacade = new WebSocketFacade(serverURL, notificationHandler);
         this.gameID = gameID;
@@ -47,12 +52,12 @@ public class GameClient implements Client{
     }
 
     private String redraw(String[] params){
-        try {
-            //webSocketFacade.send("Testing, 123");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        if(params.length!=0){
+            return "Invalid Command.";
         }
-        return "Not implemented yet";
+        DrawGame drawGame = new DrawGame(game, viewPoint);
+        drawGame.draw();
+        return "";
     }
 
     private String leave(String[] params){
@@ -60,7 +65,31 @@ public class GameClient implements Client{
     }
 
     private String move(String[] params){
-        return "Not implemented yet";
+        String letters = "abcdefgh";
+        if(params.length!=2){
+            return "Invalid Command.";
+        }
+
+        ChessPosition[] positions = new ChessPosition[2];
+        for(int i=0; i<2;i++){
+            if(params[0].length()!=2){
+                return "Location must consist of 1 letter between A and H and 1 number between 1 and 8";
+            }
+            int x = letters.indexOf(params[i].charAt(0));
+            int y = Character.getNumericValue(params[i].charAt(1));
+            if(x == -1 || y<1 || y>8){
+                return "Location must consist of 1 letter between A and H and 1 number between 1 and 8";
+            }
+            positions[i] = new ChessPosition(y, x+1);
+        }
+
+        ChessMove move = new ChessMove(positions[0], positions[1], null);
+        try {
+            webSocketFacade.makeMove(authToken, gameID, move);
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+        return "";
     }
 
     private String resign(String[] params){
@@ -76,7 +105,7 @@ public class GameClient implements Client{
         return """
                 - redraw - redraw the chessboard
                 - leave - leaves the game and returns to logged in menu
-                - move
+                - move <start Letter><start Number> <end Letter><end Number> - moves piece from start to end
                 - resign - resigns game and leaves
                 - legal - highlights all legal moves
                 - help
