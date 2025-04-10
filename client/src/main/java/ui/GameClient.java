@@ -2,20 +2,21 @@ package ui;
 
 import chess.ChessGame;
 import client.ServerFacade;
+import client.WebSocketFacade;
 
 import java.util.Arrays;
 
 public class GameClient implements Client{
     ChessGame game;
     String authToken;
-    ServerFacade serverFacade;
     Repl repl;
+    WebSocketFacade webSocketFacade;
 
     public GameClient(String serverURL, Repl repl, String authToken, ChessGame game, ChessGame.TeamColor viewPoint){
-        serverFacade = new ServerFacade(serverURL);
         this.repl = repl;
         this.authToken = authToken;
         this.game = game;
+        webSocketFacade = new WebSocketFacade(serverURL);
         DrawGame draw = new DrawGame(game, viewPoint);
         draw.draw();
     }
@@ -36,6 +37,31 @@ public class GameClient implements Client{
             case "legal" -> legal(params);
             default -> help();
         };
+    }
+
+    private String redraw(String[] params){
+        try {
+            webSocketFacade.send("Testing, 123");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return "Not implemented yet";
+    }
+
+    private String leave(String[] params){
+        return "Not implemented yet";
+    }
+
+    private String move(String[] params){
+        return "Not implemented yet";
+    }
+
+    private String resign(String[] params){
+        return "Not implemented yet";
+    }
+
+    private String legal(String[] params){
+        return "Not implemented yet";
     }
 
     @Override
