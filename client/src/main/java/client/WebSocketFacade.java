@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
 
@@ -9,9 +10,10 @@ import java.net.URISyntaxException;
 
 public class WebSocketFacade extends Endpoint {
     Session session;
-    NotificationHandler notificationHandler = new NotificationHandler();
+    NotificationHandler notificationHandler;
 
-    public WebSocketFacade(String url){
+    public WebSocketFacade(String url, ChessGame.TeamColor viewpoint){
+        notificationHandler = new NotificationHandler(viewpoint);
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");

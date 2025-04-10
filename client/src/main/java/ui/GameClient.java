@@ -1,6 +1,7 @@
 package ui;
 
 import chess.ChessGame;
+import client.NotificationHandler;
 import client.ServerFacade;
 import client.WebSocketFacade;
 
@@ -16,15 +17,13 @@ public class GameClient implements Client{
     public GameClient(String serverURL, Repl repl, String authToken, int gameID, ChessGame.TeamColor viewPoint){
         this.repl = repl;
         this.authToken = authToken;
-        webSocketFacade = new WebSocketFacade(serverURL);
+        webSocketFacade = new WebSocketFacade(serverURL, viewPoint);
         this.gameID = gameID;
         try{
             webSocketFacade.connect(authToken, gameID);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        //DrawGame draw = new DrawGame(game, viewPoint);
-        //draw.draw();
     }
 
     @Override
