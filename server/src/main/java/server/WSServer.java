@@ -11,6 +11,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.UserGameCommand;
 import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 
@@ -45,7 +46,7 @@ public class WSServer {
         }
 
         switch (userGameCommand.getCommandType()) {
-            case UserGameCommand.CommandType.CONNECT -> connect(userGameCommand, session, gameData.game());
+            case UserGameCommand.CommandType.CONNECT -> connect(userGameCommand, session, gameData.game(), userData.username());
             case UserGameCommand.CommandType.MAKE_MOVE -> makeMove(userGameCommand, session);
             case UserGameCommand.CommandType.LEAVE -> leave(userGameCommand, session);
             case UserGameCommand.CommandType.RESIGN -> resign(userGameCommand, session);
@@ -53,9 +54,10 @@ public class WSServer {
         ;
     }
 
-    private void connect(UserGameCommand userGameCommand, Session session, ChessGame game) throws Exception{
+    private void connect(UserGameCommand userGameCommand, Session session, ChessGame game, String username) throws Exception{
         roomHandler.add(userGameCommand.getGameID(), session);
-//        roomHandler.broadcast(userGameCommand.getGameID(), session, );
+        NotificationMessage joinMessage = new NotificationMessage(username + " has joined the game.");
+        roomHandler.broadcast(userGameCommand.getGameID(), session, joinMessage);
         LoadGameMessage loadGameMessage = new LoadGameMessage(game);
         session.getRemote().sendString(new Gson().toJson(loadGameMessage));
     }

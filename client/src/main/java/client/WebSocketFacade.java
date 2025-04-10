@@ -12,8 +12,8 @@ public class WebSocketFacade extends Endpoint {
     Session session;
     NotificationHandler notificationHandler;
 
-    public WebSocketFacade(String url, ChessGame.TeamColor viewpoint){
-        notificationHandler = new NotificationHandler(viewpoint);
+    public WebSocketFacade(String url, NotificationHandler notificationHandler){
+        this.notificationHandler = notificationHandler;
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");

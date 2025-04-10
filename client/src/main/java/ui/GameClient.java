@@ -13,11 +13,13 @@ public class GameClient implements Client{
     String authToken;
     Repl repl;
     WebSocketFacade webSocketFacade;
+    NotificationHandler notificationHandler;
 
     public GameClient(String serverURL, Repl repl, String authToken, int gameID, ChessGame.TeamColor viewPoint){
         this.repl = repl;
         this.authToken = authToken;
-        webSocketFacade = new WebSocketFacade(serverURL, viewPoint);
+        notificationHandler = new NotificationHandler(this, viewPoint);
+        webSocketFacade = new WebSocketFacade(serverURL, notificationHandler);
         this.gameID = gameID;
         try{
             webSocketFacade.connect(authToken, gameID);
@@ -71,6 +73,17 @@ public class GameClient implements Client{
 
     @Override
     public String help(){
-        return "help";
+        return """
+                - redraw - redraw the chessboard
+                - leave - leaves the game and returns to logged in menu
+                - move
+                - resign - resigns game and leaves
+                - legal - highlights all legal moves
+                - help
+                """;
+    }
+
+    public void updateChessGame(ChessGame game){
+        this.game = game;
     }
 }

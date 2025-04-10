@@ -5,6 +5,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.ServerMessage;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WebSocketRoomHandler {
@@ -21,7 +22,7 @@ public class WebSocketRoomHandler {
         rooms.get(gameId).remove(session);
     }
 
-    public void broadcast(Integer gameId, Session excludedSession, ServerMessage serverMessage) throws Exception{
+    public void broadcast(Integer gameId, Session excludedSession, Object serverMessage) throws Exception{
         ArrayList<Session> removeList = new ArrayList<>();
         for(Session session : rooms.get(gameId)){
             if(session.isOpen()){

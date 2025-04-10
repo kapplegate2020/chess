@@ -3,14 +3,19 @@ package client;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import ui.DrawGame;
+import ui.GameClient;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 public class NotificationHandler {
     ChessGame.TeamColor viewpoint;
+    GameClient gameClient;
 
-    public NotificationHandler(ChessGame.TeamColor viewpoint){
-        this.viewpoint = viewpoint;
+    public NotificationHandler(GameClient gameClient, ChessGame.TeamColor viewPoint){
+        this.gameClient = gameClient;
+        this.viewpoint = viewPoint;
     }
 
     public void notify(String message){
@@ -23,11 +28,13 @@ public class NotificationHandler {
     }
 
     private void notification(String message){
-
+        NotificationMessage notificationMessage = new Gson().fromJson(message, NotificationMessage.class);
+        System.out.println(notificationMessage.message());
     }
 
     private void error(String message){
-
+        ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
+        System.out.println(errorMessage.errorMessage());
     }
 
     private void load(String message){
@@ -35,5 +42,6 @@ public class NotificationHandler {
         System.out.println();
         DrawGame drawGame = new DrawGame(loadGameMessage.game(), viewpoint);
         drawGame.draw();
+        gameClient.updateChessGame(loadGameMessage.game());
     }
 }
