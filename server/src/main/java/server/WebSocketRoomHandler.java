@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WebSocketRoomHandler {
-    private ConcurrentHashMap<Integer, ArrayList<Session>> rooms = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, ArrayList<Session>> rooms = new ConcurrentHashMap<>();
 
     public void add(Integer gameID, Session session){
         if(!rooms.containsKey(gameID)){

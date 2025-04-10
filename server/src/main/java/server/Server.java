@@ -16,7 +16,7 @@ public class Server {
     private final UserService userService = new UserService(userDataAccess, authDataAccess);
     private final GameService gameService = new GameService(gameDataAccess, authDataAccess);
     private final ClearService clearService = new ClearService(userDataAccess, gameDataAccess, authDataAccess);
-    private final WSServer wsServer = new WSServer();
+    private final WSServer wsServer = new WSServer(userDataAccess, gameDataAccess, authDataAccess);
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
