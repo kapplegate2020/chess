@@ -51,7 +51,7 @@ public class GameService {
             while (gameDataAccess.getGame(gameID)!=null){
                 gameID = random.nextInt(1000000);
             }
-            GameData gameData = new GameData(gameID, null, null, createGameRequest.gameName(), null);
+            GameData gameData = new GameData(gameID, null, null, createGameRequest.gameName(), new ChessGame());
             gameDataAccess.createGame(gameData);
             return new CreateGameResult(gameID, 200, null);
         } catch (DataAccessException e) {

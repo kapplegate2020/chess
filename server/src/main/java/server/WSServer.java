@@ -32,17 +32,15 @@ public class WSServer {
         UserGameCommand userGameCommand = new Gson().fromJson(message, UserGameCommand.class);
         AuthData authData = authDataAccess.getAuth(userGameCommand.getAuthToken());
         if (authData == null) {
-            session.getRemote().sendString("");
             return;
         }
         UserData userData = userDataAccess.getUser(authData.username());
         if (userData == null) {
-            session.getRemote().sendString("");
             return;
         }
         GameData gameData = gameDataAccess.getGame(userGameCommand.getGameID());
+        System.out.println(userGameCommand.getGameID());
         if (gameData == null) {
-            session.getRemote().sendString("");
             return;
         }
 
@@ -55,10 +53,11 @@ public class WSServer {
         ;
     }
 
-    private void connect(UserGameCommand userGameCommand, Session session, ChessGame game){
+    private void connect(UserGameCommand userGameCommand, Session session, ChessGame game) throws Exception{
         roomHandler.add(userGameCommand.getGameID(), session);
 //        roomHandler.broadcast(userGameCommand.getGameID(), session, );
         LoadGameMessage loadGameMessage = new LoadGameMessage(game);
+        session.getRemote().sendString(new Gson().toJson(loadGameMessage));
     }
 
     private void makeMove(UserGameCommand userGameCommand, Session session){

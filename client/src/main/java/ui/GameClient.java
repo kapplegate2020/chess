@@ -21,10 +21,10 @@ public class GameClient implements Client{
         try{
             webSocketFacade.connect(authToken, gameID);
         } catch (Exception e) {
-
+            throw new RuntimeException(e);
         }
-        DrawGame draw = new DrawGame(game, viewPoint);
-        draw.draw();
+        //DrawGame draw = new DrawGame(game, viewPoint);
+        //draw.draw();
     }
 
     @Override
